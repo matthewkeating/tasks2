@@ -1,16 +1,25 @@
-<svg  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="#555555">
-<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-<path d="M17
-  3.34a10 10 0 1 1
-  -14.995 8.984l-.005
-  -.324l.005 -.324a10 10 0 0 1 14.995
-  -8.336zm-1.293 5.953a1 1 0 0 0
-  -1.32 -.083l-.094 .083l-3.293 3.292l-1.293
-  -1.292l-.094 -.083a1 1 0 0 0
-  -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094
-  -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
+<svg xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  viewBox="26,26,204,204"
+  width="64px"
+  height="64px"
+  fill-rule="nonzero">
+  <g fill="#555555"
+    fill-rule="nonzero"
+    stroke="none"
+    stroke-width="1"
+    stroke-linecap="butt"
+    stroke-linejoin="miter"
+    stroke-miterlimit="10"
+    stroke-dasharray=""
+    stroke-dashoffset="0"
+    font-family="none"
+    font-weight="none"
+    font-size="none"
+    text-anchor="none"
+    style="mix-blend-mode: normal">
+    <g transform="scale(3.55556,3.55556)">
+      <path d="M36,12c13.255,0 24,10.745 24,24c0,13.255 -10.745,24 -24,24c-13.255,0 -24,-10.745 -24,-24c0,-13.255 10.745,-24 24,-24zM46.018,31.464c0.901,-1.391 0.504,-3.248 -0.887,-4.149c-1.39,-0.901 -3.247,-0.503 -4.148,0.886l-7.134,11.011l-3.097,-3.519c-1.094,-1.243 -2.99,-1.364 -4.233,-0.271c-1.244,1.095 -1.365,2.99 -0.271,4.234l5.713,6.493c0.571,0.649 1.394,1.018 2.252,1.018c0.073,0 0.146,-0.002 0.22,-0.008c0.937,-0.069 1.787,-0.572 2.298,-1.36z"></path>
+    </g>
+  </g>
 </svg>
