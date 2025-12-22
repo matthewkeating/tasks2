@@ -76,7 +76,7 @@ export function getNumActiveTasks() {
 }
 
 export function getNumCompletedTasks() {
-  let array = _tasks.filter(task => task.completed === true);  // get the completed tasks
+  let array = _tasks.filter(task => task.completed === true && task.deleted === false);  // get the completed tasks
   return array.length;
 }
 
