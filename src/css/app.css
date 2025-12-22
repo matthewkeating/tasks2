@@ -1,0 +1,116 @@
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-purple: #6264ff;
+    --color-red: #AE3532;
+    --color-sidebar: #1F1F1F;
+    --color-background: #242424;
+    --color-input: #2b2b2b;
+    --color-button-hover: #2f2f2f;
+    --color-action-separator: #2f2f2f;
+    --color-selected: #363636;
+    --color-settings-separator: #555555;
+    --color-empty-list-text: #555555;
+    --color-menu-info: #555555;
+    --color-task-list-header: #555555;
+    --color-task-action-text: #555555;
+    --color-completed-task-title: #555555;
+    --color-secondary-text: #757575;
+    --color-primary-text: #dddddd;
+    --width-main-canvas: 440px;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-purple: #6264ff;
+    --color-red: #AE3532;
+    --color-sidebar: #F9F9F9;
+    --color-background: #FFFFFF;
+    --color-input: #F9F9F9;
+    --color-button-hover: #EEEEEE;
+    --color-action-separator: #EEEEEE;
+    --color-selected: #F0F0F0;
+    --color-settings-separator: #555555;
+    --color-empty-list-text: #555555;
+    --color-menu-info: #555555;
+    --color-task-list-header: #555555;
+    --color-task-action-text: #555555;
+    --color-completed-task-title: #888888;
+    --color-secondary-text: #888888;
+    --color-primary-text: #222222;
+    --width-main-canvas: 440px;
+    }
+}
+
+* {
+  font-size: .86rem;
+  font-family: Verdana, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: var(--color-primary-text);
+
+  /* disable selection */
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: 0;
+}
+
+html {
+  font-size: 100%;
+  background-color: var(--color-background);
+}
+
+body {
+  margin: 0px;
+}
+
+/* creates space at the top of the window that allows the app window to be moved */
+header {
+  -webkit-app-region: drag;
+  height: 40px;
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  background-color: var(--color-background);
+  z-index: 100;
+}
+
+h1 {
+  font-size: 140% !important;
+  font-weight: bold;
+  color: #7678ff;
+}
+
+h2 {
+  font-size: 130% !important;
+  font-weight: bold;
+  color: #6c6eef;
+}
+
+h3 {
+  font-size: 120% !important;
+  font-weight: bold;
+  color: #6264de;
+}
+
+a {
+  text-decoration: none;
+}
+
+img {
+  -webkit-user-drag: none; /* For Chrome and Safari */
+}
+
+/* Hides the scrollbar */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Add margins and space for the header */
+.app-container {
+  display: flex;
+  padding: 54px 20px 0px 20px;
+  height: calc(100vh - 54px);;
+}

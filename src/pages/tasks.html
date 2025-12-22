@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';">
+  <title>Tasks</title>
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/tasks.css">
+  <link rel="stylesheet" href="../css/icon.css">
+  <link rel="stylesheet" href="../components/editable-div.css">
+  <link rel="stylesheet" href="../components/quill.bubble.css">
+  <script src="../components/quill.js"></script>
+</head>
+<body>
+  
+  <!-- for moving the electron app window -->
+  <header></header>
+
+  <!-- set app margins, allow spacing for the header, etc. -->
+  <div class="app-container">
+
+    <div id="tasks" class="vertical-container">
+      <div class="input-box-container">
+        <input id="addTaskInputBox" type="text" spellcheck="false" placeholder="+ Add task" autofocus/>
+      </div>
+
+      <div id="listTasksArea" class="task-list">
+        <div id="activeHeading" class="heading display-none">Tasks</div>
+        <div id="activeContainer" class="draggable-container"></div>
+        <div id="completedHeading" class="heading display-none">Completed</div>
+        <div id="completedContainer" class="draggable-container display-none"></div>
+        <div id="deletedHeading" class="heading display-none">Deleted</div>
+        <div id="deletedContainer" class="draggable-container display-none"></div>
+      </div>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+      <div id="taskDetails" class="display-none">
+        <div id="taskDetailsTitle" data-placeholder="No Title"></div>        
+        <div id="notesTextArea"></div>
+      </div>
+      <div class="sidebar-icon-container">
+        <img src="../images/circle_checked.svg" class="icon-sidebar">
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="../js/tasks-controller.js"></script>
+  
+</body>
+</html>

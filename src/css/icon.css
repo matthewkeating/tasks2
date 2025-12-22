@@ -1,0 +1,45 @@
+[class^="icon-"] {
+  -webkit-user-drag: none;
+}
+
+.icon-disabled {
+  cursor: not-allowed !important;
+}
+.icon-disabled:hover {
+  filter: none !important;
+}
+
+.icon-circle {
+  width: 22px;
+}
+
+.icon-flag {
+  width: 22px;
+}
+
+.icon-note {
+  width: 14px;
+}
+
+.icon-trash,
+.icon-restore {
+  width: 22px;
+  margin-right: 4px;
+}
+
+.icon-circle-hover:hover,
+.icon-flag-hover:hover,
+.icon-restore-hover:hover
+{
+  /* given an svg with fill/stroke of #555555, the below filter will change the color to be equivalent to --color-purple: #6264ff; */ 
+  filter: invert(7%) sepia(69%) saturate(2731%) hue-rotate(226deg) brightness(101%) contrast(104%);
+}
+
+.icon-trash:hover {
+  /* given an svg with fill/stroke of #555555, the below filter will change the color to be equivalent to  --color-red: #AE3532; */
+  filter: brightness(0) saturate(100%) invert(36%) sepia(10%) saturate(4466%) hue-rotate(304deg) brightness(92%) contrast(83%);
+}
+
+.icon-sidebar {
+  width: 50px;
+}
