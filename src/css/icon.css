@@ -9,7 +9,8 @@
   filter: none !important;
 }
 
-.icon-circle {
+.icon-circle,
+.icon-drag-drop {
   width: 22px;
 }
 

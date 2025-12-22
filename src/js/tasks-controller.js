@@ -429,6 +429,24 @@ function getQuickActions(task) {
   return quickActions;
 }
 
+function getEmptyDropContainer(text) {
+  const dragDrop = document.createElement("img");
+  dragDrop.classList.add("icon-drag-drop");
+  dragDrop.src = "../images/drag_drop.svg";
+
+  const title = document.createElement("div");
+  title.classList.add("task-title");
+  title.classList.add("task-title-completed");
+  title.innerHTML = text;
+
+  const emptyDiv = document.createElement("div");
+  emptyDiv.classList.add("task-empty");
+  emptyDiv.appendChild(dragDrop);
+  emptyDiv.appendChild(title);
+
+  return emptyDiv;
+}
+
 function showQuickAction(taskId) {
 let qa = document.getElementById("qa_" + taskId);
   if (qa !== null) {
@@ -572,41 +590,16 @@ function renderTasks() {
 
   });
 
+  // handle an empty completed list
   if (tasks.getNumCompletedTasks() == 0 && settings.showingCompleted) {
-
-    const dragDrop = document.createElement("img");
-    dragDrop.classList.add("icon-circle");
-    dragDrop.src = "../images/drag_drop.svg";
-
-    const title = document.createElement("div");
-    title.classList.add("task-title");
-    title.classList.add("task-title-completed");
-    title.innerHTML = "Drop completed tasks here.";
-
-    const taskDiv = document.createElement("div");
-    taskDiv.classList.add("task-empty");
-    
-    taskDiv.appendChild(dragDrop);
-    taskDiv.appendChild(title);
-    completedContainer.appendChild(taskDiv);
+    const emptyDropContainer = getEmptyDropContainer("Drop completed tasks here.");
+    completedContainer.appendChild(emptyDropContainer);
   }
 
+  // handle an empty deleted list
   if (tasks.getNumDeletedTasks() == 0 && settings.showingDeleted) {
-    const dragDrop = document.createElement("img");
-    dragDrop.classList.add("icon-circle");
-    dragDrop.src = "../images/drag_drop.svg";
-
-    const title = document.createElement("div");
-    title.classList.add("task-title");
-    title.classList.add("task-title-completed");
-    title.innerHTML = "Drop deleted tasks here.";
-
-    const taskDiv = document.createElement("div");
-    taskDiv.classList.add("task-empty");
-    
-    taskDiv.appendChild(dragDrop);
-    taskDiv.appendChild(title);
-    deletedContainer.appendChild(taskDiv);
+    const emptyDropContainer = getEmptyDropContainer("Drop deleted tasks here.");
+    deletedContainer.appendChild(emptyDropContainer);
   }
 
 }
