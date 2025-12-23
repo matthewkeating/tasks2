@@ -11,19 +11,6 @@ var _taskNotes = null;
  ****************************************************************************/
 function bindEvents() {
 
-  // application-specific hotkeys
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape") {
-      if (document.activeElement === addTaskInputBox) {
-        // hide the window
-        window.electronAPI.hideWindow();
-      } else {
-        // set the task input box into focus
-        addTaskInputBox.focus();
-      }
-    }
-  });
-
   // Add Task input box
   addTaskInputBox.addEventListener("keypress", event => {
     if (event.key === "Enter" && addTaskInputBox.value.trim()) {
@@ -429,6 +416,155 @@ function getQuickActions(task) {
   return quickActions;
 }
 
+function getListItem(task){
+
+  const taskDiv = document.createElement("div");
+  taskDiv.classList.add("task");
+  taskDiv.draggable = true;
+  taskDiv.dataset.id = task.id;
+  taskDiv.dataset.type = "selectable";
+
+  // set up click behaviors
+  taskDiv.addEventListener("mousedown", (event) => {
+    if (event.target.classList.contains("task-title-is-editing")) return;
+    // need to select the task on mouse down to make the drag and drop functionality work as expected
+    let divType = event.target.dataset.type;
+    // if statement will allow the event to fire when the taskDiv or titleDiv is selected
+    // while preventing it from firing when any of the taskDiv children (e.g., the complete or
+    // delete buttons) are clicked
+    if (divType === "selectable") {
+      selectTask(task);
+    };
+  });
+  taskDiv.addEventListener("click", (event) => {
+    if (event.target.classList.contains("task-title-is-editing")) return;
+    // b/c the click happens after mousedown, we need to set focus to the taskNotes
+    let divType = event.target.dataset.type;
+    // if statement will allow the event to fire when the taskDiv or titleDiv is selected
+    // while preventing it from firing when any of the taskDiv children (e.g., the complete or
+    // delete buttons) are clicked
+    if (divType === "selectable") {
+      _taskNotes.focus();
+    };
+  });
+  
+  if (task.completed === false && task.deleted === false) {
+    taskDiv.addEventListener("dblclick", (event) => {
+      // b/c the click happens after mousedown, we need to set focus to the taskNotes
+      //let divType = event.target.dataset.type;
+      // if statement will allow the event to fire only when the titleDiv is selected
+      if (event.target.classList.contains("task-title")) {
+        const titleDiv = event.target;
+        titleDiv.classList.remove("task-title");
+        titleDiv.classList.add("task-title-is-editing");
+        titleDiv.setAttribute('contenteditable', 'plaintext-only');
+        titleDiv.parentElement.setAttribute('draggable', 'false');
+        
+        // set focus
+        titleDiv.focus();   
+
+        // select the text
+        const range = document.createRange();
+        range.selectNodeContents(titleDiv);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        // remove the "no title" styling and clear the contents of the div
+        if (titleDiv.classList.contains("noTitle")) {
+          titleDiv.classList.remove("noTitle");
+          titleDiv.innerHTML = "";
+        }
+
+        const exitEdit = () => {
+          titleDiv.classList.add("task-title");
+          titleDiv.classList.remove("task-title-is-editing");
+          titleDiv.removeAttribute('contenteditable');
+          titleDiv.parentElement.setAttribute('draggable', 'true');
+
+          const title = titleDiv.innerText.trim();
+
+          if (title.length === 0) {
+            setNoTitle(titleDiv, true);
+          } else {
+            setNoTitle(titleDiv, false);
+          }
+          
+          titleDiv.removeEventListener('blur', exitEdit);
+          titleDiv.removeEventListener('keydown', keyCheck);
+          titleDiv.removeEventListener('input', onInput);
+        };
+
+        const keyCheck = (e) => {
+          if (e.key === 'Enter' || e.key === 'Escape') {
+            e.preventDefault();
+            titleDiv.blur();
+          }
+        };
+
+        const onInput = (e) => {
+          // sync with the title div in the side bar
+          const title = titleDiv.innerText.trim();
+          _editableTaskDetailsTitle.setText(title);
+          // save the changes
+          _selectedTask.title = title;
+          tasks.saveTasks();
+        }
+
+        titleDiv.addEventListener('blur', exitEdit);
+        titleDiv.addEventListener('keydown', keyCheck);
+        titleDiv.addEventListener('input', onInput);
+
+      };
+    });
+  }
+  
+  const circle = getCompleteAction(task)
+
+  // Create the div for the task title 
+  const title = document.createElement("div");
+  title.dataset.id = task.id;
+  title.dataset.type = "selectable";
+  title.classList.add("task-title");
+
+  title.innerText = task.title;
+  if (task.title.length === 0) {
+    setNoTitle(title, true);
+  }
+
+  if (task.completed) {
+    title.classList.add("task-title-completed");
+  } else if (task.deleted) {
+    title.classList.add("task-title-deleted");
+  } else if (task.flagged === true) {
+    title.classList.add("flagged");
+  }
+
+  // Create the img element that will hold the note indicator
+  const note = document.createElement("img");
+  if (task.notes !== null) {
+      note.src = "../images/note.svg";
+  }
+  note.classList.add("icon-note");
+  note.addEventListener("click", (event) => { _selectedTask = task; });
+
+  let quickActions = null;
+  if (settings.quickActionsVisibility === "never") {
+    quickActions = document.createElement("div");
+  } else {
+    quickActions = getQuickActions(task);
+    quickActions.classList.add("display-none");
+  }
+
+  // Add all of the above task elements to the task div
+  taskDiv.appendChild(circle);
+  taskDiv.appendChild(title);
+  taskDiv.appendChild(quickActions);
+  taskDiv.appendChild(note);
+
+  return taskDiv;
+}
+
 function getEmptyDropContainer(text) {
   const dragDrop = document.createElement("img");
   dragDrop.classList.add("icon-drag-drop");
@@ -508,76 +644,7 @@ function renderTasks() {
   tasksToRender.forEach(task => {
 
     // Create the div that will hold all the elements of the task
-    const taskDiv = document.createElement("div");
-    taskDiv.classList.add("task");
-    taskDiv.draggable = true;
-    taskDiv.dataset.id = task.id;
-    taskDiv.dataset.type = "selectable";
-
-    // set up click behaviors
-    taskDiv.addEventListener("mousedown", (event) => {
-      // need to select the task on mouse down to make the drag and drop functionality work as expected
-      let divType = event.target.dataset.type;
-      // if statement will allow the event to fire when the taskDiv or titleDiv is selected
-      // while preventing it from firing when any of the taskDiv children (e.g., the complete or
-      // delete buttons) are clicked
-      if (divType === "selectable") {
-        selectTask(task);
-      };
-    });
-    taskDiv.addEventListener("click", (event) => {
-      // b/c the click happens after mousedown, we need to set focus to the taskNotes
-      let divType = event.target.dataset.type;
-      // if statement will allow the event to fire when the taskDiv or titleDiv is selected
-      // while preventing it from firing when any of the taskDiv children (e.g., the complete or
-      // delete buttons) are clicked
-      if (divType === "selectable") {
-        _taskNotes.focus();
-      };
-    });
-
-    const circle = getCompleteAction(task)
-
-    // Create the div for the task title 
-    const title = document.createElement("div");
-    title.dataset.id = task.id;
-    title.dataset.type = "selectable";
-    title.classList.add("task-title");
-
-    title.innerText = task.title;
-    if (task.title.length === 0) {
-      setNoTitle(title, true);
-    }
-
-    if (task.completed) {
-      title.classList.add("task-title-completed");
-    } else if (task.deleted) {
-      title.classList.add("task-title-deleted");
-    } else if (task.flagged === true) {
-      title.classList.add("flagged");
-    }
-
-    // Create the img element that will hold the note indicator
-    const note = document.createElement("img");
-    if (task.notes !== null) {
-        note.src = "../images/note.svg";
-    }
-    note.classList.add("icon-note");
-    note.addEventListener("click", (event) => { _selectedTask = task; });
-
-    let quickActions = null;
-    if (settings.quickActionsVisibility === "never") {
-      quickActions = document.createElement("div");
-    } else {
-      quickActions = getQuickActions(task);
-      quickActions.classList.add("display-none");
-    }
-
-    // Add all of the above task elements to the task div
-    taskDiv.appendChild(circle);
-    taskDiv.appendChild(title);
-    taskDiv.appendChild(quickActions);
-    taskDiv.appendChild(note);
+    const taskDiv = getListItem(task);
      
     // Add the task div to the task container
     if (task.deleted === true) {

@@ -61,12 +61,21 @@ of the parent .task element */
 
 .task-title {
   flex: 1;
-  padding: 13px;
+  margin: 7px;
+  padding: 6px;
   outline: 0px solid transparent;
 
   white-space: nowrap;       /* Prevent line breaks */
   overflow: hidden;          /* Hide overflowing text */
   text-overflow: ellipsis;   /* Add ellipsis at the end */
+}
+
+.task-title-is-editing {
+  flex: 1;
+  margin: 7px;
+  padding: 6px;
+  outline: 0px solid transparent;
+  background-color: var(--color-input);
 }
 
 .task-title-completed,
