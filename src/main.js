@@ -104,9 +104,11 @@ const createWindow = () => {
   });
 
   // automatically hide when the window loses focus
-  mainWindow.on('blur', () => {
-    mainWindow.hide();
-  });
+  if (app.isPackaged) {
+    mainWindow.on('blur', () => {
+      mainWindow.hide();
+    });
+  }
 
   mainWindow.on('close', () => {
     store.set('windowBounds', mainWindow.getBounds());
