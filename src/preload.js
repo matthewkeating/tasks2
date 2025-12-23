@@ -49,7 +49,7 @@ const api = {
   // menu actions
   enableTaskMenu: () => ipcRenderer.send('enable-task-menu'),
   disableTaskMenu: () => ipcRenderer.send('disable-task-menu'),
-  hideWindow: () => ipcRenderer.send(''),
+  hideWindow: () => ipcRenderer.send('hide-window'),
   updateTrayLabels: (showingCompleted, showingDeleted) => ipcRenderer.send('update-tray-labels', { showingCompleted, showingDeleted }),
 
   // call for opening links externally

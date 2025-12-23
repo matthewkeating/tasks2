@@ -11,6 +11,19 @@ var _taskNotes = null;
  ****************************************************************************/
 function bindEvents() {
 
+  window.addEventListener("keydown", event => {
+    if (event.key === 'Escape') {
+      // Check if the user is currently typing in an editable area
+      const isTyping = event.target.isContentEditable;
+
+      if (isTyping) {
+        event.target.blur(); // Just exit the input
+      } else {
+        window.electronAPI.hideWindow();
+      }
+    }
+  });
+
   // Add Task input box
   addTaskInputBox.addEventListener("keypress", event => {
     if (event.key === "Enter" && addTaskInputBox.value.trim()) {
@@ -32,7 +45,6 @@ function bindEvents() {
       selectTask(newTask);
       addTaskInputBox.value = "";
     }
-  
   });
   addTaskInputBox.addEventListener("keydown", event => {
     if (event.key === "Tab" && tasks.getNumTasks(settings.showingCompleted) > 0) {
@@ -496,7 +508,7 @@ function getListItem(task){
         };
 
         const keyCheck = (e) => {
-          if (e.key === 'Enter' || e.key === 'Escape') {
+          if (e.key === 'Enter') {
             e.preventDefault();
             titleDiv.blur();
           }
