@@ -64,13 +64,16 @@ function bindEvents() {
     const titleDiv = document.querySelector(`[data-id="${_selectedTask.id}"]`).getElementsByClassName("task-title")[0];
     titleDiv.innerHTML = title;
     _selectedTask.title = title;
-    tasks.saveTasks();
+    //tasks.saveTasks();
 
     if (title.length === 0) {
       setNoTitle(titleDiv, true);
     } else {
       setNoTitle(titleDiv, false);
     }
+  });
+  _editableTaskDetailsTitle.getEditableDiv().addEventListener('blur', () => {
+    tasks.saveTasks();
   });
 
   // task notes
@@ -501,6 +504,8 @@ function getListItem(task){
           } else {
             setNoTitle(titleDiv, false);
           }
+
+          tasks.saveTasks();
           
           titleDiv.removeEventListener('blur', exitEdit);
           titleDiv.removeEventListener('keydown', keyCheck);
@@ -512,6 +517,10 @@ function getListItem(task){
             e.preventDefault();
             titleDiv.blur();
           }
+          if (e.key === 'Tab') {
+            e.preventDefault();
+            _taskNotes.focus();   // Set focus to the notes box
+          }
         };
 
         const onInput = (e) => {
@@ -520,7 +529,6 @@ function getListItem(task){
           _editableTaskDetailsTitle.setText(title);
           // save the changes
           _selectedTask.title = title;
-          tasks.saveTasks();
         }
 
         titleDiv.addEventListener('blur', exitEdit);
