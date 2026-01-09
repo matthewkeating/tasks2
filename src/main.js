@@ -1,5 +1,6 @@
 const { app, BrowserWindow, globalShortcut, ipcMain, Menu, nativeImage, screen, shell, Tray } = require('electron/main');
 const { toggleComplete, deleteTask, createMenuTemplate, enableTaskMenu, showHideTasks, updateMenuSettings } = require('./components/menu.js');
+const log = require('electron-log');
 const path = require('node:path');
 const Store = require('./js/electron-store.js');
 const store = new Store();
@@ -137,6 +138,12 @@ const createWindow = () => {
     shell.openExternal(url.url);
   });
 
+  // Listen for the log event from the Renderer
+  // write to ~/Library/Logs/<app name>/main.log
+  ipcMain.on('write-log', (event, message) => {
+      log.info(`[Renderer]: ${message}`);
+  });
+
   ipcMain.on("quit-app", (event) => {
     app.quit();
   });
@@ -170,14 +177,17 @@ app.whenReady().then(() => {
   });
 
   // Because the hot keys associated with toggle complete and delete task are
-  // global hot keys on Mac, they must be suppressed when a task is not selected.
-  // The functions below use the enabled (or disabled) menu items as a proxy
-  // for a task being selected.
+  // global hot keys on Mac, they must be suppressed when the window in not in
+  // focus.
   globalShortcut.register('CommandOrControl+Shift+O', () => {
-    toggleComplete(mainWindow);
+    if (mainWindow.isFocused()) {
+      toggleComplete(mainWindow);
+    }
   });
   globalShortcut.register('CommandOrControl+Backspace', () => {
-    deleteTask(mainWindow);
+    if (mainWindow.isFocused()) {
+      deleteTask(mainWindow);
+    }
   });
 
 });
