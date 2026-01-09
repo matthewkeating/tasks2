@@ -55,6 +55,9 @@ const api = {
   // call for opening links externally
   openLinkExternal: (url) => ipcRenderer.send('open-link-externally', { url }),
 
+  // for error logging
+  log: (message) => ipcRenderer.send('write-log', message),
+
   // call to quit the applications
   quitApp: () => ipcRenderer.send('quit-app'),
 
