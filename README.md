@@ -63,7 +63,7 @@ Per the tables below, Tasks provides application-wide keyboard shortcuts.
 | ⌘ ⇧ [            | Previous task        |
 
 ### Mobile Support and Syncing Across Devices
-Tasks does ***not*** support mobile or sync data across devices. These features are not a important to me but I may add them in the future as I recognize there importance to some.
+Tasks does ***not*** support mobile or sync data across devices. These features are not a important to me but I may add them in the future as I recognize their importance to some.
 
 ## To Dos
 None.

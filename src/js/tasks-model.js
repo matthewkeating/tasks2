@@ -81,7 +81,7 @@ export function deleteTask(task) {
   task.deleted = true;
 
   // this is necessary to position a deleted task at the top of the list
-   let position = "top";
+  let position = "top";
   _tasks = _tasks.filter(i => i.id !== task.id);
   addTask(task, position);
 
@@ -91,7 +91,7 @@ export function restoreTask(task) {
   task.deleted = false;
 
   // this is necessary to position a restored task at the top of the list
-   let position = "top";
+  let position = "top";
   _tasks = _tasks.filter(i => i.id !== task.id);
   addTask(task, position);
 

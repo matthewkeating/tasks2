@@ -63,7 +63,7 @@ function bindEvents() {
     const title = _editableTaskDetailsTitle.getText();
     // update the title in the task list
     const titleDiv = document.querySelector(`[data-id="${_selectedTask.id}"]`).getElementsByClassName("task-title")[0];
-    titleDiv.innerHTML = title;
+    titleDiv.textContent = title;
     _selectedTask.title = title;
 
     if (title.length === 0) {

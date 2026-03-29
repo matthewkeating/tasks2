@@ -121,7 +121,7 @@ const createWindow = () => {
 
   ipcMain.on("update-tray-labels", (event, { showingCompleted, showingDeleted }) => {
     updateMenuSettings("showing-completed", showingCompleted);
-    updateMenuSettings("showing-deleted", showingDeleted)  
+    updateMenuSettings("showing-deleted", showingDeleted);
     const contextMenu = Menu.buildFromTemplate(createMenuTemplate(mainWindow));
     tray.setContextMenu(contextMenu);
   });
