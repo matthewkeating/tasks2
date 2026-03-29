@@ -2,9 +2,10 @@ import * as tasks from './tasks-model.js';
 import * as settings from './settings-model.js';
 import { EditableDivWithPlaceholder } from '../components/editable-div.js';
 
-var _selectedTask = null;
-var _editableTaskDetailsTitle = null;
-var _taskNotes = null;
+let _selectedTask = null;
+let _editableTaskDetailsTitle = null;
+let _taskNotes = null;
+const _addTaskInputBox = document.getElementById("addTaskInputBox");
 
 /****************************************************************************
  * Element Binding
@@ -25,10 +26,10 @@ function bindEvents() {
   });
 
   // Add Task input box
-  addTaskInputBox.addEventListener("keypress", event => {
-    if (event.key === "Enter" && addTaskInputBox.value.trim()) {
-      const newTask = { id: Date.now().toString(),
-        title: addTaskInputBox.value,
+  _addTaskInputBox.addEventListener("keypress", event => {
+    if (event.key === "Enter" && _addTaskInputBox.value.trim()) {
+      const newTask = { id: crypto.randomUUID(),
+        title: _addTaskInputBox.value,
         flagged: false,
         completed: false,
         deleted: false,
@@ -43,17 +44,17 @@ function bindEvents() {
   
       renderTasks();
       selectTask(newTask);
-      addTaskInputBox.value = "";
+      _addTaskInputBox.value = "";
     }
   });
-  addTaskInputBox.addEventListener("keydown", event => {
+  _addTaskInputBox.addEventListener("keydown", event => {
     if (event.key === "Tab" && tasks.getNumTasks(settings.showingCompleted) > 0) {
       event.preventDefault();
       const firstTask = tasks.getTaskByIndex(0);
       selectTask(firstTask);
     }
   });
-  addTaskInputBox.addEventListener('focus', event => {
+  _addTaskInputBox.addEventListener('focus', event => {
     deselectTask(_selectedTask);
   });
 
@@ -64,7 +65,6 @@ function bindEvents() {
     const titleDiv = document.querySelector(`[data-id="${_selectedTask.id}"]`).getElementsByClassName("task-title")[0];
     titleDiv.innerHTML = title;
     _selectedTask.title = title;
-    //tasks.saveTasks();
 
     if (title.length === 0) {
       setNoTitle(titleDiv, true);
@@ -81,7 +81,7 @@ function bindEvents() {
     // note: delta is the formatted contents in Quill
   
     // update the notes indicator in the task list
-    const div =  document.querySelector(`[data-id="${_selectedTask.id}"]`); 
+    const div =  document.querySelector(`[data-id="${_selectedTask.id}"]`);
     const img = div.getElementsByClassName("icon-note")[0];
     const isEmpty = _taskNotes.getContents().ops.length === 1 && _taskNotes.getText().trim() === "";
 
@@ -112,7 +112,7 @@ function bindEvents() {
  * IPC
  ****************************************************************************/
 window.electronAPI.newTask(() => {
-  addTaskInputBox.focus();
+  _addTaskInputBox.focus();
 });
 window.electronAPI.toggleShowCompleted(() => {
   toggleShowCompleted(_selectedTask);
@@ -136,7 +136,7 @@ window.electronAPI.deleteTask(() => {
   deleteTaskAndHighlightNextTask(_selectedTask);
 });
 window.electronAPI.purgeDeletedTasks(() => {
-  var result = confirm("Are you sure you want to permanently remove all deleted tasks? This action cannot be undone.");
+  let result = confirm("Are you sure you want to permanently remove all deleted tasks? This action cannot be undone.");
     if (!result) {
       return;
     }
@@ -219,7 +219,7 @@ export function toggleShowCompleted(task) {
   if (!settings.showingCompleted && task !== null && task.completed === true) {
     // the selected task is being hidden
     task = null;
-    addTaskInputBox.focus();
+    _addTaskInputBox.focus();
   }
   renderTasks();
   selectTask(task);
@@ -239,7 +239,7 @@ export function toggleShowDeleted(task) {
   if (!settings.showingDeleted && task !== null && task.deleted === true) {
     // the selected task is being hidden
     task = null;
-    addTaskInputBox.focus();
+    _addTaskInputBox.focus();
   }
   renderTasks();
   selectTask(task);
@@ -276,7 +276,9 @@ function toggleCompleted(task) {
     // the task being toggled is not the current selected task
     selectTask(_selectedTask);
   } else {
-    throw "Unexpected condition."
+    const msg = `toggleCompleted: unexpected condition. task=${JSON.stringify(task)}, _selectedTask=${JSON.stringify(_selectedTask)}`;
+    window.electronAPI.log(msg);  // writes to ~/Library/Logs/.../main.log
+    console.error(msg);           // visible in DevTools during development
   }
 
 }
@@ -310,12 +312,10 @@ function getNextTaskToHighlight(task) {
   }
 
   // now deal with the harder cases :(
-  var retVal = null;
 
-  var previousTask = taskArray[indexOfTask - 1];
-  var nextTask = taskArray[indexOfTask + 1];
+  const previousTask = taskArray[indexOfTask - 1];
+  const nextTask = taskArray[indexOfTask + 1];
 
-  //if (nextTask.pinned === _selectedTask.pinned && nextTask.completed === _selectedTask.completed) {
   if (nextTask.completed === _selectedTask.completed && nextTask.deleted === _selectedTask.deleted) {
     return nextTask;
   } else {
@@ -330,7 +330,7 @@ function deleteTaskAndHighlightNextTask(task) {
 
   if (task.deleted === true) {
     // the task is already in the deleted list, so confirm permanent deletion before proceeding
-    var result = confirm("This action cannot be undone. Are you sure you want to permanently delete this task?");
+    let result = confirm("This action cannot be undone. Are you sure you want to permanently delete this task?");
     if (!result) {
       return;
     }
@@ -339,7 +339,7 @@ function deleteTaskAndHighlightNextTask(task) {
   if (_selectedTask === task) {
     // if the user is deleting the selected task, we want to automatically select the
     // next "most logical" task to in the list
-    var nextTaskToHighlight = getNextTaskToHighlight(task);
+    const nextTaskToHighlight = getNextTaskToHighlight(task);
     if (nextTaskToHighlight !== null) {
       _selectedTask = nextTaskToHighlight;
     } else {
@@ -463,7 +463,7 @@ function getListItem(task){
   if (task.completed === false && task.deleted === false) {
     taskDiv.addEventListener("dblclick", (event) => {
       // b/c the click happens after mousedown, we need to set focus to the taskNotes
-      //let divType = event.target.dataset.type;
+
       // if statement will allow the event to fire only when the titleDiv is selected
       if (event.target.classList.contains("task-title")) {
         const titleDiv = event.target;
@@ -601,7 +601,7 @@ function getEmptyDropContainer(text) {
 }
 
 function showQuickAction(taskId) {
-let qa = document.getElementById("qa_" + taskId);
+  let qa = document.getElementById("qa_" + taskId);
   if (qa !== null) {
     qa.classList.remove("display-none");
   }
@@ -623,7 +623,7 @@ function setNoTitle(div, hasNoTitle) {
 
 function renderTasks() {
 
-  var tasksToRender = null;
+  let tasksToRender = null;
 
   // reset the active tasks container
   activeContainer.innerHTML = "";

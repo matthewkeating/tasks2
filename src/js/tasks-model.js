@@ -1,4 +1,4 @@
-var _tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let _tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
 export function saveTasks() {
   localStorage.setItem("tasks", JSON.stringify(_tasks));
@@ -18,12 +18,7 @@ export function sortTasks() {
   _tasks = activeTasks.concat(completedTasks).concat(deletedTasks);
 }
 
-export function getTasks(includeCompleted, includeDeleted) {
-
-  if (arguments.length === 0) {
-    includeCompleted = true;
-    includeDeleted = true; 
-  }
+export function getTasks(includeCompleted = true, includeDeleted = true) {
 
   let activeTasks = _tasks.filter(task => task.deleted === false && task.completed === false);  // get the active tasks
   
@@ -39,15 +34,6 @@ export function getTasks(includeCompleted, includeDeleted) {
 
   let retVal = activeTasks.concat(completedTasks).concat(deletedTasks);
 
-  /*
-  var retVal;
-  if (includeCompleted) {
-    retVal = _tasks;
-  } else {
-    retVal = _tasks.filter((task => task.completed === false));  // get the uncompleted tasks
-  }
-  */
-
   return retVal;
 
 }
@@ -60,14 +46,10 @@ export function getTaskByIndex(index) {
 }
 
 export function getNumTasks(includeCompleted) {
-  let retVal = null;
   if (includeCompleted) {
-    retVal = _tasks.length;
-  } else {
-    const array = _tasks.filter(task => task.completed === false);
-    retVal = array.length;
+    return _tasks.length;
   }
-  return retVal;
+  return _tasks.filter(task => task.completed === false).length;
 }
 
 export function getNumActiveTasks() {
@@ -103,7 +85,6 @@ export function deleteTask(task) {
   _tasks = _tasks.filter(i => i.id !== task.id);
   addTask(task, position);
 
-  saveTasks();
 }
 
 export function restoreTask(task) {
@@ -114,7 +95,6 @@ export function restoreTask(task) {
   _tasks = _tasks.filter(i => i.id !== task.id);
   addTask(task, position);
 
-  saveTasks();
 }
 
 export function permanentlyDeleteTask(task) {

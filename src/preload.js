@@ -42,8 +42,8 @@ const api = {
     ipcRenderer.on('next-task', callback);
   },
   selectPreviousTask: (callback) => {
-    ipcRenderer.removeAllListeners('pervious-task');
-    ipcRenderer.on('pervious-task', callback);
+    ipcRenderer.removeAllListeners('previous-task');
+    ipcRenderer.on('previous-task', callback);
   },
  
   // menu actions

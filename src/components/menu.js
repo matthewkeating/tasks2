@@ -127,7 +127,7 @@ function createMenuTemplate(mainWindow) {
           id: 'task-previous-task',
           label: 'Previous Task',
           click: () => {
-            mainWindow.webContents.send('pervious-task');
+            mainWindow.webContents.send('previous-task');
           },
           accelerator: 'CmdOrCtrl+Shift+[',
         },

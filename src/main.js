@@ -32,8 +32,8 @@ const createWindow = () => {
   const screenHeight = screenDimensions.height;
 
   // set sensible defaults for window size and position
-  var width = maximumWidth;
-  var height = 800;
+  let width = maximumWidth;
+  let height = 800;
   let x = (screenWidth - width) / 2;
   let y = ((screenHeight - height) / 2) + menuBarHeight;
   
@@ -77,11 +77,11 @@ const createWindow = () => {
     show: false,  // don't show the window until the html is loaded (see the 'ready-to-show' method below)
 
     nodeIntegration: false, // for additional security
-    contextIsolation: false, // important for using IPC
+    contextIsolation: true, // important for using IPC
 
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      sandbox: false,
+      sandbox: true,
     },
   });
 

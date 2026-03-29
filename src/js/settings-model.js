@@ -1,5 +1,5 @@
-export var showingCompleted = JSON.parse(localStorage.getItem("show_completed")) || false;
-export var showingDeleted = JSON.parse(localStorage.getItem("show_deleted")) || false;
+export let showingCompleted = JSON.parse(localStorage.getItem("show_completed")) || false;
+export let showingDeleted = JSON.parse(localStorage.getItem("show_deleted")) || false;
 
 export function restoreDefaultSettings() {
   setShowingCompleted(false);
