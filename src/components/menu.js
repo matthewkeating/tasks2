@@ -11,21 +11,6 @@ function updateMenuSettings(setting, value) {
   menuSettings[setting] = value;
 }
 
-// Because the hot keys associated with toggle complete and delete task are
-// global hot keys on Mac, they must be suppressed when a task is not selected.
-// The functions below use the enabled (or disabled) menu items as a proxy
-// for a task being selected.
-function toggleComplete(mainWindow) {
-  if (Menu.getApplicationMenu().getMenuItemById('task-toggle-complete').enabled) {
-    mainWindow.webContents.send('toggle-completed');
-  }
-}
-function deleteTask(mainWindow) {
-  if (Menu.getApplicationMenu().getMenuItemById('task-delete-task').enabled) {
-    mainWindow.webContents.send('delete-task');
-  }
-}
-
 function showHideTasks(mainWindow) {
   if (mainWindow.isVisible()) {
     // hide window
@@ -37,7 +22,7 @@ function showHideTasks(mainWindow) {
   }
 }
 
-function createMenuTemplate(mainWindow, forTray) {
+function createMenuTemplate(mainWindow) {
 
   // Set dynamic labels
   let showHideTasksAppLabel = 'Show Tasks';
@@ -85,6 +70,7 @@ function createMenuTemplate(mainWindow, forTray) {
     {
       id: 'task-menu',
       label: 'Task',
+      visible: true,
       submenu: [
         {
           label: 'New Task',
@@ -115,16 +101,14 @@ function createMenuTemplate(mainWindow, forTray) {
         {
           id: 'task-toggle-complete',
           label: 'Toggle Completed',
-          enabled: false,
           click: () => {
-            toggleComplete();
+            mainWindow.webContents.send('toggle-completed');
           },
           accelerator: 'CmdOrCtrl+Shift+O',
         },
         {
           id: 'task-toggle-flag',
           label: 'Toggle Flag',
-          enabled: false,
           click: () => {
             mainWindow.webContents.send('toggle-flag');
           },
@@ -134,7 +118,6 @@ function createMenuTemplate(mainWindow, forTray) {
         {
           id: 'task-next-task',
           label: 'Next Task',
-          enabled: false,
           click: () => {
             mainWindow.webContents.send('next-task');
           },
@@ -143,7 +126,6 @@ function createMenuTemplate(mainWindow, forTray) {
         {
           id: 'task-previous-task',
           label: 'Previous Task',
-          enabled: false,
           click: () => {
             mainWindow.webContents.send('pervious-task');
           },
@@ -153,9 +135,8 @@ function createMenuTemplate(mainWindow, forTray) {
         {
           id: 'task-delete-task',
           label: 'Delete Task',
-          enabled: false,
           click: () => {
-            deleteTask();
+            mainWindow.webContents.send('delete-task');
           },
           accelerator: 'CmdOrCtrl+Backspace',
         }
@@ -172,6 +153,7 @@ function createMenuTemplate(mainWindow, forTray) {
     {
       id: 'dev-tools',
       label: 'Developer Tools',
+      visible: false,
       submenu: [
         { role: 'reload' },
         {
@@ -195,57 +177,8 @@ function createMenuTemplate(mainWindow, forTray) {
     { label: 'Quit', role: 'quit' }
   ];
 
-  // remove the 'Task' and 'Developer' menus from the tray menu
-  // note: do this because I don't want the 'Task' and 'Developer' menu in the tray but I do
-  // want them in the application menu (because I want the hot keys)
-  if (forTray) {
-    const taskMenuIndex = menuTemplate.findIndex(item => item.id === 'task-menu');
-
-    if (taskMenuIndex !== -1) {
-      menuTemplate.splice(taskMenuIndex, 1);  // remove the 'Task' menu
-      menuTemplate.splice(taskMenuIndex, 1);  // remove the separator after the 'Task' menu
-    }
-
-    const devToolsIndex = menuTemplate.findIndex(item => item.id === 'dev-tools');
-
-    if (devToolsIndex !== -1) {
-      menuTemplate.splice(devToolsIndex, 1);  // remove the 'Developer Tools' menu
-      menuTemplate.splice(devToolsIndex, 1);  // remove the separator after the 'Developer Tools' menu
-    }
-  }
-
-  // The application menu serves the purpose of enabling hot keys
-  // However, menu items must be nested under a top level menu
-  // The logic below takes the entire menuTemplate and nests it under a top level menu item
-  if (!forTray) {
-    // Wrap the existing template into a new structure
-    let nestedTemplate = [
-      {
-        label: 'Top Level',
-        submenu: menuTemplate // This puts all your original items inside
-      }
-    ];
-
-    // Replace the original menuTemplate with the new nested one
-    menuTemplate = nestedTemplate;
-  }
-
   return menuTemplate;
 
 }
 
-function enableTaskMenu(enabled) {
-  const m_ttc = Menu.getApplicationMenu().getMenuItemById('task-toggle-complete');
-  const m_ttf = Menu.getApplicationMenu().getMenuItemById('task-toggle-flag');
-  const m_tnt = Menu.getApplicationMenu().getMenuItemById('task-next-task');
-  const m_tpt = Menu.getApplicationMenu().getMenuItemById('task-previous-task');
-  const m_tdt = Menu.getApplicationMenu().getMenuItemById('task-delete-task');
-
-  m_ttc.enabled = enabled;
-  m_ttf.enabled = enabled;
-  m_tnt.enabled = enabled;
-  m_tpt.enabled = enabled;
-  m_tdt.enabled = enabled;
-}
-
-module.exports = { toggleComplete, deleteTask, createMenuTemplate, enableTaskMenu, showHideTasks, updateMenuSettings };
+module.exports = { createMenuTemplate, showHideTasks, updateMenuSettings };

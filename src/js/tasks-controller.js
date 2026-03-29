@@ -167,8 +167,6 @@ function selectTask(task) {
   showQuickAction(_selectedTask.id);
   showTaskDetails(_selectedTask);
 
-  window.electronAPI.enableTaskMenu();
-
 }
 
 function showTaskDetails(task) {
@@ -209,7 +207,6 @@ function deselectTask(task) {
 
   _selectedTask = null;
 
-  window.electronAPI.disableTaskMenu();
 }
 
 export function toggleShowCompleted(task) {

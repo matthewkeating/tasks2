@@ -1,5 +1,5 @@
 const { app, BrowserWindow, globalShortcut, ipcMain, Menu, nativeImage, screen, shell, Tray } = require('electron/main');
-const { toggleComplete, deleteTask, createMenuTemplate, enableTaskMenu, showHideTasks, updateMenuSettings } = require('./components/menu.js');
+const { createMenuTemplate, showHideTasks, updateMenuSettings } = require('./components/menu.js');
 const log = require('electron-log');
 const path = require('node:path');
 const Store = require('./js/electron-store.js');
@@ -94,13 +94,13 @@ const createWindow = () => {
 
   mainWindow.on('hide', () => {
     updateMenuSettings("window-active", false);
-    const contextMenu = Menu.buildFromTemplate(createMenuTemplate(mainWindow, true));
+    const contextMenu = Menu.buildFromTemplate(createMenuTemplate(mainWindow));
     tray.setContextMenu(contextMenu);
   });
 
   mainWindow.on('focus', () => {
     updateMenuSettings("window-active", true);
-    const contextMenu = Menu.buildFromTemplate(createMenuTemplate(mainWindow, true));
+    const contextMenu = Menu.buildFromTemplate(createMenuTemplate(mainWindow));
     tray.setContextMenu(contextMenu);
   });
 
@@ -115,14 +115,6 @@ const createWindow = () => {
     store.set('windowBounds', mainWindow.getBounds());
   });
 
-  ipcMain.on('enable-task-menu', (event) => {
-    enableTaskMenu(true);
-  });
-
-  ipcMain.on('disable-task-menu', (event) => {
-    enableTaskMenu(false);
-  });
-
   ipcMain.on('hide-window', (event) => {
     mainWindow.hide();
   });
@@ -130,7 +122,7 @@ const createWindow = () => {
   ipcMain.on("update-tray-labels", (event, { showingCompleted, showingDeleted }) => {
     updateMenuSettings("showing-completed", showingCompleted);
     updateMenuSettings("showing-deleted", showingDeleted)  
-    const contextMenu = Menu.buildFromTemplate(createMenuTemplate(mainWindow, true));
+    const contextMenu = Menu.buildFromTemplate(createMenuTemplate(mainWindow));
     tray.setContextMenu(contextMenu);
   });
 
@@ -163,31 +155,17 @@ app.whenReady().then(() => {
   tray = new Tray(icon);
 
   // create the tray menu from template
-  const contextMenu = Menu.buildFromTemplate(createMenuTemplate(mainWindow, true));
+  const contextMenu = Menu.buildFromTemplate(createMenuTemplate(mainWindow));
   tray.setContextMenu(contextMenu);
 
   // create the application (aka Mac) menu from the same template
   // note: you need to set the application menu on Mac even if you don't want to show it (because of hot keys)
-  const menu = Menu.buildFromTemplate(createMenuTemplate(mainWindow, false));
+  const menu = Menu.buildFromTemplate(createMenuTemplate(mainWindow));
   Menu.setApplicationMenu(menu);
-  
+
   // Register a global shortcuts
   globalShortcut.register('CommandOrControl+Shift+\'', () => {
     showHideTasks(mainWindow);
-  });
-
-  // Because the hot keys associated with toggle complete and delete task are
-  // global hot keys on Mac, they must be suppressed when the window in not in
-  // focus.
-  globalShortcut.register('CommandOrControl+Shift+O', () => {
-    if (mainWindow.isFocused()) {
-      toggleComplete(mainWindow);
-    }
-  });
-  globalShortcut.register('CommandOrControl+Backspace', () => {
-    if (mainWindow.isFocused()) {
-      deleteTask(mainWindow);
-    }
   });
 
 });
