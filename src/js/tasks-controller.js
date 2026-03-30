@@ -12,19 +12,6 @@ const _addTaskInputBox = document.getElementById("addTaskInputBox");
  ****************************************************************************/
 function bindEvents() {
 
-  window.addEventListener("keydown", event => {
-    if (event.key === 'Escape') {
-      // Check if the user is currently typing in an editable area
-      const isTyping = event.target.isContentEditable;
-
-      if (isTyping) {
-        event.target.blur(); // Just exit the input
-      } else {
-        window.electronAPI.hideWindow();
-      }
-    }
-  });
-
   // Add Task input box
   _addTaskInputBox.addEventListener("keypress", event => {
     if (event.key === "Enter" && _addTaskInputBox.value.trim()) {
