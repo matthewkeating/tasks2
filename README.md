@@ -56,7 +56,7 @@ Per the tables below, Tasks provides application-wide keyboard shortcuts.
 |------------------|----------------------|
 | ⌘ ⇧ '            | Show/Hide application  |
 | ⌘ N              | Add task             |
-| ⌘ ⇧ O            | Toggle completed     |
+| ⌘ ⇧ K            | Toggle completed     |
 | ⌘ ⇧ F            | Toggle flag          |
 | ⌘ ⌫              | Delete task          |
 | ⌘ ⇧ ]            | Next task            |

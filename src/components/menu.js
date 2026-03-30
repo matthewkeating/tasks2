@@ -51,20 +51,27 @@ function createMenuTemplate(mainWindow) {
     },
     { type: 'separator' },
     {
-      id: 'toggle-show-completed',
-      label: showHideCompletedTasksLabel,
-      click: () => {
-        mainWindow.webContents.send('toggle-show-completed');
-      },
-      accelerator: 'CmdOrCtrl+Shift+C',
-    },
-    {
-      id: 'toggle-show-deleted',
-      label: showHideDeletedTasksLabel,
-      click: () => {
-        mainWindow.webContents.send('toggle-show-deleted');
-      },
-      accelerator: 'CmdOrCtrl+Shift+D',
+      id: 'view-menu',
+      label: 'View',
+      visible: true,
+      submenu: [
+        {
+          id: 'toggle-show-completed',
+          label: showHideCompletedTasksLabel,
+          click: () => {
+            mainWindow.webContents.send('toggle-show-completed');
+          },
+          accelerator: 'CmdOrCtrl+Shift+C',
+        },
+        {
+          id: 'toggle-show-deleted',
+          label: showHideDeletedTasksLabel,
+          click: () => {
+            mainWindow.webContents.send('toggle-show-deleted');
+          },
+          accelerator: 'CmdOrCtrl+Shift+D',
+        }
+      ]
     },
     { type: 'separator' },
     {
@@ -104,7 +111,7 @@ function createMenuTemplate(mainWindow) {
           click: () => {
             mainWindow.webContents.send('toggle-completed');
           },
-          accelerator: 'CmdOrCtrl+Shift+O',
+          accelerator: 'CmdOrCtrl+Shift+K',
         },
         {
           id: 'task-toggle-flag',
