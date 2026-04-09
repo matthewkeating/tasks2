@@ -32,7 +32,6 @@ I will use a CSS pseudo-element (in this case, the .task::after element). */
   align-items: center;
   padding: 0px 10px 0px 10px;
   border-radius: 5px;
-  min-height: 44px;
 }
 
 .task::after {
@@ -62,7 +61,7 @@ of the parent .task element */
 
 .task-title {
   flex: 1;
-  margin: 7px;
+  margin: 6px;
   padding: 6px;
   outline: 0px solid transparent;
 
@@ -73,7 +72,7 @@ of the parent .task element */
 
 .task-title-is-editing {
   flex: 1;
-  margin: 7px;
+  margin: 6px;
   padding: 6px;
   outline: 0px solid transparent;
   background-color: var(--color-input);
@@ -92,7 +91,6 @@ of the parent .task element */
   display: flex;
   padding: 0px 10px 0px 10px;
   border-radius: 5px;
-  min-height: 44px;
 }
 
 .draggable-container {
@@ -146,11 +144,10 @@ of the parent .task element */
 
 #addTaskInputBox {
   flex: 1;
-  background-color: var(--color-input);
   border: 1px solid transparent;
   border-radius: 5px;
   box-shadow: none;
-  padding: 10px;
+  padding: 9px;
   outline: none;
   box-sizing: border-box;
 }
