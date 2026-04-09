@@ -69,7 +69,7 @@ body {
 /* creates space at the top of the window that allows the app window to be moved */
 header {
   -webkit-app-region: drag;
-  height: 40px;
+  height: 24px;
   position: fixed;
   top: 0px;
   width: 100%;
@@ -111,6 +111,6 @@ img {
 /* Add margins and space for the header */
 .app-container {
   display: flex;
-  padding: 54px 20px 0px 20px;
+  padding: 24px 20px 0px 20px;
   height: calc(100vh - 54px);
 }

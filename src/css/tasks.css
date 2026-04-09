@@ -1,8 +1,8 @@
 .input-box-container {
   display: flex;
   align-items: center; /* Aligns items vertically */
-  top: 40px;
-  padding-bottom: 15px;
+  top: 24px;
+
   background-color: var(--color-background);
   /* the below allows the input box to be always on top */
   width: var(--width-main-canvas);
@@ -55,6 +55,7 @@ of the parent .task element */
 
 .task-list {
   width: var(--width-main-canvas);
+  padding-top: 20px;
   display: flex;
   flex-direction: column;
 }
