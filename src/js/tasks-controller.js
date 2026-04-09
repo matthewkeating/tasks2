@@ -661,6 +661,12 @@ function renderTasks() {
 
   });
 
+  // handle an empty active list
+  if (tasks.getNumActiveTasks() == 0) {
+    const emptyDropContainer = getEmptyDropContainer("Drop active tasks here.");
+    activeContainer.appendChild(emptyDropContainer);
+  }
+
   // handle an empty completed list
   if (tasks.getNumCompletedTasks() == 0 && settings.showingCompleted) {
     const emptyDropContainer = getEmptyDropContainer("Drop completed tasks here.");
@@ -696,7 +702,7 @@ draggableContainers.forEach(container => {
     const dragging = document.querySelector(".dragging");
     const afterElement = getDragAfterElement(container, event.clientY);
 
-    if (container.id == "completedContainer" || container.id == "deletedContainer") {
+    if (container.id == "activeContainer" || container.id == "completedContainer" || container.id == "deletedContainer") {
       container.classList.add("dragover-completed");  
       return;
     }
