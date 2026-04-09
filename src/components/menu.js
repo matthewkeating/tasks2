@@ -160,12 +160,15 @@ function createMenuTemplate(mainWindow) {
     {
       id: 'dev-tools',
       label: 'Developer Tools',
-      visible: false,
+      visible: true,
       submenu: [
-        { role: 'reload' },
+        {
+          role: 'reload',
+          accelerator: 'CmdOrCtrl+R',
+        },
         {
           label: 'Toggle Developer Tools',
-          accelerator: 'CmdOrCtrl+Option+I', // Optional shortcut
+          accelerator: 'CmdOrCtrl+Option+I',
           click: () => {
               mainWindow.webContents.toggleDevTools();
           }
