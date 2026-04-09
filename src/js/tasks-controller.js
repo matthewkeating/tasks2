@@ -617,8 +617,15 @@ function renderTasks() {
   if (tasks.getNumActiveTasks() < 1 &&
       settings.showingCompleted === false &&
       settings.showingDeleted === false) {
+    // hide both the header and the list of active tasks if there are no tasks
+    // and neither the completed or deleted list is showing
     activeHeading.classList.add("display-none");
     activeContainer.classList.add("display-none");
+  } else if (tasks.getNumActiveTasks() > 0 &&
+      settings.showingCompleted === false &&
+      settings.showingDeleted === false) {
+    // hide the header if only the active tasks are showing
+    activeHeading.classList.add("display-none");
   } else {
     activeHeading.classList.remove("display-none");
     activeContainer.classList.remove("display-none");
