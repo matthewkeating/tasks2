@@ -294,11 +294,11 @@ function toggleCompleted(task) {
   } else {
     // ASSERT: there are at least two tasks in the active task list (before the complete action)
     // ASSERT: the task being complete is the currently highlighted task
-    if (task === tasks.getNextTask(task, false, false)) {
+    if (task === tasks.getNextTask(task, true, false, false)) {
       // ASSERT: the task being completed is the last task (i.e., in the last position) in the list
-      nextTaskToHighlight = tasks.getPreviousTask(task, false, false);  // highlight the previous
+      nextTaskToHighlight = tasks.getPreviousTask(task, true, false, false);  // highlight the previous
     } else {
-      nextTaskToHighlight = tasks.getNextTask(task, false, false);  // highlight the next task
+      nextTaskToHighlight = tasks.getNextTask(task, true, false, false);  // highlight the next task
     }
   }
   
@@ -309,11 +309,11 @@ function toggleCompleted(task) {
 }
 
 function selectPreviousTask(task) {
-  let previousTask = null 
-  if (tasks.getFirstTask(settings.showingCompleted, settings.showingDeleted) === _selectedTask) {
+  let previousTask = null
+  if (tasks.getFirstTask(true, settings.showingCompleted, settings.showingDeleted) === _selectedTask) {
     _addTaskInputBox.focus();
   } else {
-    previousTask = tasks.getPreviousTask(task, settings.showingCompleted, settings.showingDeleted);
+    previousTask = tasks.getPreviousTask(task, true, settings.showingCompleted, settings.showingDeleted);
   }
   selectTask(previousTask);
 }
@@ -321,68 +321,46 @@ function selectPreviousTask(task) {
 function selectNextTask(task) {
   let nextTask = null;
   if (document.activeElement === _addTaskInputBox) {
-    nextTask = tasks.getFirstTask(settings.showingCompleted, settings.showingDeleted);
+    nextTask = tasks.getFirstTask(true, settings.showingCompleted, settings.showingDeleted);
   } else {
-    nextTask = tasks.getNextTask(task, settings.showingCompleted, settings.showingDeleted);
+    nextTask = tasks.getNextTask(task, true, settings.showingCompleted, settings.showingDeleted);
   }
   selectTask(nextTask);
-}
-
-// TODO: the next selected behavior for deleted tasks is not consistent with the next selected
-// behavior for completed tasks. Change the deleted task behavior to act more like the completed
-// task behavior
-function getNextTaskToHighlight(task) {
-  
-  let indexOfTask = null;
-  let taskArray = tasks.getTasks();
-  indexOfTask = taskArray.findIndex(i => i.id === task.id);  // get the position in the array the task passed into this function
-
-  // these are the easy cases :)
-  if (taskArray.length === 1) {
-    // after deleting, there will be no tasks left in the list
-    return null;
-  } else if (indexOfTask === 0) {
-    // you are deleting the first task in the list, so return the second task
-    return taskArray[1];
-  } else if (indexOfTask === taskArray.length-1) {
-    // you are deleting the last task in the list, so return the second to last task
-    return taskArray[taskArray.length - 2];
-  }
-
-  // now deal with the harder cases :(
-
-  const previousTask = taskArray[indexOfTask - 1];
-  const nextTask = taskArray[indexOfTask + 1];
-
-  if (nextTask.completed === _selectedTask.completed && nextTask.deleted === _selectedTask.deleted) {
-    return nextTask;
-  } else {
-    return previousTask;
-  }
-
-  return null;
-
 }
 
 function deleteTaskAndHighlightNextTask(task) {
 
   if (task.deleted === true) {
-    // the task is already in the deleted list, so confirm permanent deletion before proceeding
     let result = confirm("This action cannot be undone. Are you sure you want to permanently delete this task?");
     if (!result) {
       return;
     }
   }
 
-  if (_selectedTask === task) {
-    // if the user is deleting the selected task, we want to automatically select the
-    // next "most logical" task to in the list
-    const nextTaskToHighlight = getNextTaskToHighlight(task);
-    if (nextTaskToHighlight !== null) {
-      _selectedTask = nextTaskToHighlight;
+  let nextTaskToHighlight = null;
+
+  const includeActive = !task.completed && !task.deleted;
+  const includeCompleted = task.completed;
+  const includeDeleted = task.deleted;
+
+  let groupCount;
+  if (task.deleted) {
+    groupCount = tasks.getNumDeletedTasks();
+  } else if (task.completed) {
+    groupCount = tasks.getNumCompletedTasks();
+  } else {
+    groupCount = tasks.getNumActiveTasks();
+  }
+
+  if (groupCount === 1) {
+    _addTaskInputBox.focus();
+  } else if (task !== _selectedTask) {
+    nextTaskToHighlight = _selectedTask;
+  } else {
+    if (task === tasks.getNextTask(task, includeActive, includeCompleted, includeDeleted)) {
+      nextTaskToHighlight = tasks.getPreviousTask(task, includeActive, includeCompleted, includeDeleted);
     } else {
-      // there are no tasks left in the list
-      _selectedTask = null;
+      nextTaskToHighlight = tasks.getNextTask(task, includeActive, includeCompleted, includeDeleted);
     }
   }
 
@@ -392,13 +370,14 @@ function deleteTaskAndHighlightNextTask(task) {
     tasks.deleteTask(task);
   }
   renderTasks();
-  selectTask(_selectedTask);
+  selectTask(nextTaskToHighlight);
 
 }
 
 function restoreTask(task) {
   tasks.restoreTask(task);
   renderTasks();
+  selectTask(task);
 }
 
 function getCompleteAction(task) {

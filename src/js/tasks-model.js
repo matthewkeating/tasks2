@@ -18,10 +18,13 @@ export function sortTasks() {
   _tasks = activeTasks.concat(completedTasks).concat(deletedTasks);
 }
 
-export function getTasks(includeCompleted = true, includeDeleted = true) {
+export function getTasks(includeActive = true, includeCompleted = true, includeDeleted = true) {
 
-  let activeTasks = _tasks.filter(task => task.deleted === false && task.completed === false);  // get the active tasks
-  
+  let activeTasks = [];
+  if (includeActive) {
+    activeTasks = _tasks.filter(task => task.deleted === false && task.completed === false);
+  }
+
   let completedTasks = [];
   if (includeCompleted) {
     completedTasks = _tasks.filter(task => task.completed === true && task.deleted === false);
@@ -32,9 +35,7 @@ export function getTasks(includeCompleted = true, includeDeleted = true) {
     deletedTasks = _tasks.filter(task => task.deleted === true);
   }
 
-  let retVal = activeTasks.concat(completedTasks).concat(deletedTasks);
-
-  return retVal;
+  return activeTasks.concat(completedTasks).concat(deletedTasks);
 
 }
 
@@ -136,9 +137,9 @@ export function toggleFlagged(task) {
   saveTasks();
 }
 
-export function getFirstTask(includeCompleted, includeDeleted) {
+export function getFirstTask(includeActive, includeCompleted, includeDeleted) {
 
-  let taskArray = getTasks(includeCompleted, includeDeleted);
+  let taskArray = getTasks(includeActive, includeCompleted, includeDeleted);
   if (taskArray.length === 0)
     return null;
   return taskArray[0];
@@ -148,9 +149,9 @@ export function getFirstTask(includeCompleted, includeDeleted) {
 // returns the previous task in the list
 // if the task given is null, return null
 // if the task given is the first task, return the first task
-export function getPreviousTask(task, includeCompleted, includeDeleted) {
+export function getPreviousTask(task, includeActive, includeCompleted, includeDeleted) {
 
-  let taskArray = getTasks(includeCompleted, includeDeleted);
+  let taskArray = getTasks(includeActive, includeCompleted, includeDeleted);
 
   if (task === null) {
     return null;
@@ -169,9 +170,9 @@ export function getPreviousTask(task, includeCompleted, includeDeleted) {
 // returns the next task in the list
 // if the task given is null, return null
 // if the task given is the last task, return the last task
-export function getNextTask(task, includeCompleted, includeDeleted) {
+export function getNextTask(task, includeActive, includeCompleted, includeDeleted) {
 
-  let taskArray = getTasks(includeCompleted, includeDeleted);
+  let taskArray = getTasks(includeActive, includeCompleted, includeDeleted);
 
   if (task === null) {
       return null;
