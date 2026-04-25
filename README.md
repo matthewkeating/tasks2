@@ -38,10 +38,10 @@ Completed tasks are, naturally, those tasks marked as complete.
 Unsurprisingly, manually deleted tasks (included completed tasks) go to Deleted.
 
 #### Task Ordering/Reordering
-Task ordering is important for prioritizing and maintaining focus. In Tasks, by design, completed and deleted tasks cannot be reordered.
+Task ordering is important for prioritizing and maintaining focus. In Tasks, by design, completed and deleted tasks cannot be reordered. The most recent completed (or deleted) tasks are placed to the top of the completed (or deleted) lists.
 
 #### Notes
-Each task can have associated notes. The editor supports headings; ordered and unordered lists; checklists; as well as bold, italics, underline, and other font decoration.
+Each task can have associated notes. The editor supports headings; ordered and unordered lists; checklists; hyperlinks; as well as bold, italics, underline, and other font decoration.
 
 #### Light and Dark Themes
 Tasks has two themes: light and dark.
@@ -52,15 +52,34 @@ Tasks has two themes: light and dark.
 ### Keyboard Shortcuts
 Per the tables below, Tasks provides application-wide keyboard shortcuts.
 
+#### Application Shortcuts
+
 | Shortcut         | Action               |
 |------------------|----------------------|
-| ⌘ ⇧ '            | Show/Hide application  |
-| ⌘ N              | Add task             |
+| ⌘ ⇧ '            | Show/Hide application|
+| ⌘ ⇧ .            | Show sidebar         |
+| ⌘ ⇧ ,            | Hide sidebar         |
+| ⌘ ⇧ C            | Show/Hide completed tasks |
+| ⌘ ⇧ D            | Show/Hide deleted tasks   |
+| ⌘ ⇧ [            | Previous task        |
+
+
+#### Task Shortcuts
+
+| Shortcut         | Action               |
+|------------------|----------------------|
+| ⌘ N              | New task             |
 | ⌘ ⇧ K            | Toggle completed     |
 | ⌘ ⇧ F            | Toggle flag          |
 | ⌘ ⌫              | Delete task          |
 | ⌘ ⇧ ]            | Next task            |
 | ⌘ ⇧ [            | Previous task        |
+
+### Gestures
+Tasks allows you to show/hide the sidebar using gestures:
+
+* Using a trackpad, a two finger swipe right or left with show or hide the sidebar, respectively
+* Using a mouse, pressing and holding the right button, "swiping" right or left, and releasing will show or hide the sidebar, respectively
 
 ### Mobile Support and Syncing Across Devices
 Tasks does ***not*** support mobile or sync data across devices. These features are not a important to me but I may add them in the future as I recognize their importance to some.
