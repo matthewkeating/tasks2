@@ -85,6 +85,7 @@ of the parent .task element */
 
 .task-selected {
   background-color: var(--color-selected) !important;
+  font-weight: bold;
 }
 
 .task-empty {
