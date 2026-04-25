@@ -447,81 +447,79 @@ function getListItem(task){
     };
   });
   
-  if (task.completed === false && task.deleted === false) {
-    taskDiv.addEventListener("dblclick", (event) => {
-      // b/c the click happens after mousedown, we need to set focus to the taskNotes
+  taskDiv.addEventListener("dblclick", (event) => {
+    // b/c the click happens after mousedown, we need to set focus to the taskNotes
 
-      // if statement will allow the event to fire only when the titleDiv is selected
-      if (event.target.classList.contains("task-title")) {
-        const titleDiv = event.target;
-        titleDiv.classList.remove("task-title");
-        titleDiv.classList.add("task-title-is-editing");
-        titleDiv.setAttribute('contenteditable', 'plaintext-only');
-        titleDiv.parentElement.setAttribute('draggable', 'false');
+    // if statement will allow the event to fire only when the titleDiv is selected
+    if (event.target.classList.contains("task-title")) {
+      const titleDiv = event.target;
+      titleDiv.classList.remove("task-title");
+      titleDiv.classList.add("task-title-is-editing");
+      titleDiv.setAttribute('contenteditable', 'plaintext-only');
+      titleDiv.parentElement.setAttribute('draggable', 'false');
+      
+      // set focus
+      titleDiv.focus();   
+
+      // select the text
+      const range = document.createRange();
+      range.selectNodeContents(titleDiv);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      // remove the "no title" styling and clear the contents of the div
+      if (titleDiv.classList.contains("noTitle")) {
+        titleDiv.classList.remove("noTitle");
+        titleDiv.innerHTML = "";
+      }
+
+      const exitEdit = () => {
+        titleDiv.classList.add("task-title");
+        titleDiv.classList.remove("task-title-is-editing");
+        titleDiv.removeAttribute('contenteditable');
+        titleDiv.parentElement.setAttribute('draggable', 'true');
+
+        const title = titleDiv.innerText.trim();
+
+        if (title.length === 0) {
+          setNoTitle(titleDiv, true);
+        } else {
+          setNoTitle(titleDiv, false);
+        }
+
+        tasks.saveTasks();
         
-        // set focus
-        titleDiv.focus();   
-
-        // select the text
-        const range = document.createRange();
-        range.selectNodeContents(titleDiv);
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-
-        // remove the "no title" styling and clear the contents of the div
-        if (titleDiv.classList.contains("noTitle")) {
-          titleDiv.classList.remove("noTitle");
-          titleDiv.innerHTML = "";
-        }
-
-        const exitEdit = () => {
-          titleDiv.classList.add("task-title");
-          titleDiv.classList.remove("task-title-is-editing");
-          titleDiv.removeAttribute('contenteditable');
-          titleDiv.parentElement.setAttribute('draggable', 'true');
-
-          const title = titleDiv.innerText.trim();
-
-          if (title.length === 0) {
-            setNoTitle(titleDiv, true);
-          } else {
-            setNoTitle(titleDiv, false);
-          }
-
-          tasks.saveTasks();
-          
-          titleDiv.removeEventListener('blur', exitEdit);
-          titleDiv.removeEventListener('keydown', keyCheck);
-          titleDiv.removeEventListener('input', onInput);
-        };
-
-        const keyCheck = (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            titleDiv.blur();
-          }
-          if (e.key === 'Tab') {
-            e.preventDefault();
-            _taskNotes.focus();   // Set focus to the notes box
-          }
-        };
-
-        const onInput = (e) => {
-          // sync with the title div in the side bar
-          const title = titleDiv.innerText.trim();
-          _editableTaskDetailsTitle.setText(title);
-          // save the changes
-          _selectedTask.title = title;
-        }
-
-        titleDiv.addEventListener('blur', exitEdit);
-        titleDiv.addEventListener('keydown', keyCheck);
-        titleDiv.addEventListener('input', onInput);
-
+        titleDiv.removeEventListener('blur', exitEdit);
+        titleDiv.removeEventListener('keydown', keyCheck);
+        titleDiv.removeEventListener('input', onInput);
       };
-    });
-  }
+
+      const keyCheck = (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          titleDiv.blur();
+        }
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          _taskNotes.focus();   // Set focus to the notes box
+        }
+      };
+
+      const onInput = (e) => {
+        // sync with the title div in the side bar
+        const title = titleDiv.innerText.trim();
+        _editableTaskDetailsTitle.setText(title);
+        // save the changes
+        _selectedTask.title = title;
+      }
+
+      titleDiv.addEventListener('blur', exitEdit);
+      titleDiv.addEventListener('keydown', keyCheck);
+      titleDiv.addEventListener('input', onInput);
+
+    };
+  });
   
   const circle = getCompleteAction(task)
 
@@ -709,7 +707,8 @@ draggableContainers.forEach(container => {
     const dragging = document.querySelector(".dragging");
     const afterElement = getDragAfterElement(container, event.clientY);
 
-    if (container.id == "activeContainer" || container.id == "completedContainer" || container.id == "deletedContainer") {
+    // Completed and Deleted lists cannot be re-ordered
+    if (container.id == "completedContainer" || container.id == "deletedContainer") {
       container.classList.add("dragover-completed");  
       return;
     }
