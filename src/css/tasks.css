@@ -15,11 +15,19 @@
   flex-direction: column;
 }
 
-.heading {
+.heading-1 {
   font-size: 81%;
   text-transform: uppercase;
   color: var(--color-task-list-header);
-  padding-top: 15px;
+  padding-top: 10px;
+  margin-bottom: 5px;
+}
+
+.heading-n {
+  font-size: 81%;
+  text-transform: uppercase;
+  color: var(--color-task-list-header);
+  padding-top: 20px;
   margin-bottom: 5px;
 }
 

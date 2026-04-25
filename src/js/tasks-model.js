@@ -129,6 +129,15 @@ export function toggleFlagged(task) {
   saveTasks();
 }
 
+export function getFirstTask(includeCompleted, includeDeleted) {
+
+  let taskArray = getTasks(includeCompleted, includeDeleted);
+  if (taskArray.length === 0)
+    return null;
+  return taskArray[0];
+
+}
+
 // returns the previous task in the list
 // if the task given is null, return null
 // if the task given is the first task, return the first task

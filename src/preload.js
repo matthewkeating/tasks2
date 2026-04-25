@@ -50,6 +50,10 @@ const api = {
   hideWindow: () => ipcRenderer.send('hide-window'),
   updateTrayLabels: (showingCompleted, showingDeleted) => ipcRenderer.send('update-tray-labels', { showingCompleted, showingDeleted }),
 
+  // calls for window resizing
+  showSidebar: () => ipcRenderer.send('show-sidebar'),
+  hideSidebar: () => ipcRenderer.send('hide-sidebar'),
+
   // call for opening links externally
   openLinkExternal: (url) => ipcRenderer.send('open-link-externally', { url }),
 

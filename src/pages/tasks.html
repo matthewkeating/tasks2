@@ -22,15 +22,15 @@
 
     <div id="tasks" class="vertical-container">
       <div class="input-box-container">
-        <input id="addTaskInputBox" type="text" spellcheck="false" placeholder="+ Add task" autofocus/>
+        <input id="addTaskInputBox" type="text" spellcheck="false" placeholder="+ Add task" autofocus tabindex="-1" />
       </div>
 
       <div id="listTasksArea" class="task-list">
-        <div id="activeHeading" class="heading display-none">Tasks</div>
+        <div id="activeHeading" class="heading-1 display-none">Tasks</div>
         <div id="activeContainer" class="draggable-container"></div>
-        <div id="completedHeading" class="heading display-none">Completed</div>
+        <div id="completedHeading" class="heading-n display-none">Completed</div>
         <div id="completedContainer" class="draggable-container display-none"></div>
-        <div id="deletedHeading" class="heading display-none">Deleted</div>
+        <div id="deletedHeading" class="heading-n display-none">Deleted</div>
         <div id="deletedContainer" class="draggable-container display-none"></div>
       </div>
     </div>

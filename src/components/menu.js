@@ -22,6 +22,18 @@ function showHideTasks(mainWindow) {
   }
 }
 
+function showSidebar(mainWindow) {
+  mainWindow.setMinimumSize(780, 518);
+  mainWindow.setMaximumSize(780, 1200);
+  mainWindow.setSize(780, mainWindow.getSize()[1], true);
+}
+
+function hideSidebar(mainWindow) {
+  mainWindow.setMinimumSize(480, 518);
+  mainWindow.setMaximumSize(480, 1200);
+  mainWindow.setSize(480, mainWindow.getSize()[1], true);
+}
+
 function createMenuTemplate(mainWindow) {
 
   // Set dynamic labels
@@ -55,6 +67,19 @@ function createMenuTemplate(mainWindow) {
       label: 'View',
       visible: true,
       submenu: [
+        {
+          id: 'show-sidebar',
+          label: 'Show Sidebar',
+          click: () => { showSidebar(mainWindow); },
+          accelerator: 'CmdOrCtrl+Shift+.',
+        },
+        {
+          id: 'hide-sidebar',
+          label: 'Hide Sidebar',
+          click: () => { hideSidebar(mainWindow); },
+          accelerator: 'CmdOrCtrl+Shift+,',
+        },
+        { type: 'separator' },
         {
           id: 'toggle-show-completed',
           label: showHideCompletedTasksLabel,
@@ -191,4 +216,4 @@ function createMenuTemplate(mainWindow) {
 
 }
 
-module.exports = { createMenuTemplate, showHideTasks, updateMenuSettings };
+module.exports = { createMenuTemplate, showHideTasks, showSidebar, hideSidebar, updateMenuSettings };

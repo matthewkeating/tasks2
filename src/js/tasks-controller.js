@@ -1,5 +1,6 @@
 import * as tasks from './tasks-model.js';
 import * as settings from './settings-model.js';
+import * as sidebar from './sidebar.js';
 import { EditableDivWithPlaceholder } from '../components/editable-div.js';
 
 let _selectedTask = null;
@@ -12,8 +13,11 @@ const _addTaskInputBox = document.getElementById("addTaskInputBox");
  ****************************************************************************/
 function bindEvents() {
 
+  sidebar.registerGesturesAndHotKeys();
+
   // Add Task input box
-  _addTaskInputBox.addEventListener("keypress", event => {
+  _addTaskInputBox.addEventListener("keydown", event => {
+
     if (event.key === "Enter" && _addTaskInputBox.value.trim()) {
       const newTask = { id: crypto.randomUUID(),
         title: _addTaskInputBox.value,
@@ -35,10 +39,9 @@ function bindEvents() {
     }
   });
   _addTaskInputBox.addEventListener("keydown", event => {
-    if (event.key === "Tab" && tasks.getNumTasks(settings.showingCompleted) > 0) {
+    // overwrite the default tab behavior (and do nothing instead)
+    if (event.key === "Tab") {
       event.preventDefault();
-      const firstTask = tasks.getTaskByIndex(0);
-      selectTask(firstTask);
     }
   });
   _addTaskInputBox.addEventListener('focus', event => {
@@ -134,6 +137,19 @@ window.electronAPI.purgeDeletedTasks(() => {
 /****************************************************************************
  * Methods
  ****************************************************************************/
+
+function showSidebar() {
+  if (_selectedTask !== null) {
+    taskDetails.classList.remove("display-none");
+  }
+  _taskNotes.focus();
+  sidebar.showSidebar();
+}
+
+function hideSidebar() {
+  sidebar.hideSidebar();
+  taskDetails.classList.add("display-none");
+}
 
 function selectTask(task) {
 
@@ -249,34 +265,58 @@ function toggleCompleted(task) {
 
   if (task.deleted)
     return;
+
+  if (task.completed) {
+    tasks.toggleCompleted(task);
+    renderTasks();
+    selectTask(task);
+    return;
+  }
+
+  let nextTaskToHighlight = null;
+  let numActiveTasks = tasks.getNumActiveTasks();
+
+  // get the next task to highlight
+  if (numActiveTasks === 1) {
+    // ASSERT: task being completed is the only remaining active task
+    _addTaskInputBox.focus();
+  } else if (task !== _selectedTask) {
+    // ASSERT: the task being complete is not currently selected
+    nextTaskToHighlight = _selectedTask;  // the next task to highlight is the currently highlighted task
+  } else {
+    // ASSERT: there are at least two tasks in the active task list (before the complete action)
+    // ASSERT: the task being complete is the currently highlighted task
+    if (task === tasks.getNextTask(task, false, false)) {
+      // ASSERT: the task being completed is the last task (i.e., in the last position) in the list
+      nextTaskToHighlight = tasks.getPreviousTask(task, false, false);  // highlight the previous
+    } else {
+      nextTaskToHighlight = tasks.getNextTask(task, false, false);  // highlight the next task
+    }
+  }
   
   tasks.toggleCompleted(task);
   renderTasks();
-
-  if (_selectedTask === task && settings.showingCompleted) {
-    // the task being toggled is the currently selected task and the UI is showing completed tasks
-    selectTask(task);
-  } else if (_selectedTask === task && !settings.showingCompleted) {
-    // the task being toggled is the currently selected task but the UI is not showing completed tasks
-    getNextTaskToHighlight(task);
-  } else if (_selectedTask !== task) {
-    // the task being toggled is not the current selected task
-    selectTask(_selectedTask);
-  } else {
-    const msg = `toggleCompleted: unexpected condition. task=${JSON.stringify(task)}, _selectedTask=${JSON.stringify(_selectedTask)}`;
-    window.electronAPI.log(msg);  // writes to ~/Library/Logs/.../main.log
-    console.error(msg);           // visible in DevTools during development
-  }
+  selectTask(nextTaskToHighlight);
 
 }
 
 function selectPreviousTask(task) {
-  let previousTask = tasks.getPreviousTask(task, settings.showingCompleted, settings.showingDeleted);
+  let previousTask = null 
+  if (tasks.getFirstTask(settings.showingCompleted, settings.showingDeleted) === _selectedTask) {
+    _addTaskInputBox.focus();
+  } else {
+    previousTask = tasks.getPreviousTask(task, settings.showingCompleted, settings.showingDeleted);
+  }
   selectTask(previousTask);
 }
 
 function selectNextTask(task) {
-  let nextTask = tasks.getNextTask(task, settings.showingCompleted, settings.showingDeleted);
+  let nextTask = null;
+  if (document.activeElement === _addTaskInputBox) {
+    nextTask = tasks.getFirstTask(settings.showingCompleted, settings.showingDeleted);
+  } else {
+    nextTask = tasks.getNextTask(task, settings.showingCompleted, settings.showingDeleted);
+  }
   selectTask(nextTask);
 }
 
@@ -450,7 +490,7 @@ function getListItem(task){
   taskDiv.addEventListener("dblclick", (event) => {
     // b/c the click happens after mousedown, we need to set focus to the taskNotes
 
-    // if statement will allow the event to fire only when the titleDiv is selected
+    // if statement will allow the event to fire only when the titleDiv was double clicked
     if (event.target.classList.contains("task-title")) {
       const titleDiv = event.target;
       titleDiv.classList.remove("task-title");
@@ -495,18 +535,18 @@ function getListItem(task){
         titleDiv.removeEventListener('input', onInput);
       };
 
-      const keyCheck = (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
+      const keyCheck = (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
           titleDiv.blur();
         }
-        if (e.key === 'Tab') {
-          e.preventDefault();
+        if (event.key === 'Tab') {
+          event.preventDefault();
           _taskNotes.focus();   // Set focus to the notes box
         }
       };
 
-      const onInput = (e) => {
+      const onInput = (event) => {
         // sync with the title div in the side bar
         const title = titleDiv.innerText.trim();
         _editableTaskDetailsTitle.setText(title);
@@ -517,6 +557,11 @@ function getListItem(task){
       titleDiv.addEventListener('blur', exitEdit);
       titleDiv.addEventListener('keydown', keyCheck);
       titleDiv.addEventListener('input', onInput);
+      titleDiv.addEventListener('mousedown', (event) => {
+        if (event.button == 2) {  // 2 is a right click
+          exitEdit();
+        }
+      });
 
     };
   });
@@ -624,6 +669,7 @@ function renderTasks() {
       settings.showingDeleted === false) {
     // hide the header if only the active tasks are showing
     activeHeading.classList.add("display-none");
+    activeContainer.classList.remove("display-none");
   } else {
     activeHeading.classList.remove("display-none");
     activeContainer.classList.remove("display-none");

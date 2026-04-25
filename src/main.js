@@ -1,5 +1,5 @@
 const { app, BrowserWindow, globalShortcut, ipcMain, Menu, nativeImage, screen, shell, Tray } = require('electron/main');
-const { createMenuTemplate, showHideTasks, updateMenuSettings } = require('./components/menu.js');
+const { createMenuTemplate, showHideTasks, showSidebar, hideSidebar, updateMenuSettings } = require('./components/menu.js');
 const log = require('electron-log');
 const path = require('node:path');
 const Store = require('./js/electron-store.js');
@@ -19,7 +19,7 @@ const createWindow = () => {
 
   // the app is designed be small and unobtrusive
   // set window size parameters to disallow users from making the window too big or too small
-  const minimumWidth = 780;
+  const minimumWidth = 480;
   const maximumWidth = 780;
   const minimumHeight = 518;
   const maximumHeight = 1200;
@@ -118,6 +118,9 @@ const createWindow = () => {
   ipcMain.on('hide-window', (event) => {
     mainWindow.hide();
   });
+
+  ipcMain.on('show-sidebar', () => { showSidebar(mainWindow); });
+  ipcMain.on('hide-sidebar', () => { hideSidebar(mainWindow); });
 
   ipcMain.on("update-tray-labels", (event, { showingCompleted, showingDeleted }) => {
     updateMenuSettings("showing-completed", showingCompleted);
