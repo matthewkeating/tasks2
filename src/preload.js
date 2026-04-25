@@ -35,6 +35,10 @@ const api = {
     ipcRenderer.removeAllListeners('purge-deleted-tasks');
     ipcRenderer.on('purge-deleted-tasks', callback);
   },
+  purgeCompletedTasks: (callback) => {
+    ipcRenderer.removeAllListeners('purge-completed-tasks');
+    ipcRenderer.on('purge-completed-tasks', callback);
+  },
   
   // navigation actions
   selectNextTask: (callback) => {

@@ -32,7 +32,7 @@ const createWindow = () => {
   const screenHeight = screenDimensions.height;
 
   // set sensible defaults for window size and position
-  let width = maximumWidth;
+  let width = minimumWidth;
   let height = 800;
   let x = (screenWidth - width) / 2;
   let y = ((screenHeight - height) / 2) + menuBarHeight;

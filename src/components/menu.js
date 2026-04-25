@@ -176,6 +176,12 @@ function createMenuTemplate(mainWindow) {
     },
     { type: 'separator' },
     {
+      label: 'Purge Completed Tasks',
+      click: () => {
+        mainWindow.webContents.send('purge-completed-tasks');
+      },
+    },
+    {
       label: 'Purge Deleted Tasks',
       click: () => {
         mainWindow.webContents.send('purge-deleted-tasks');

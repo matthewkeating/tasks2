@@ -110,6 +110,13 @@ export function permanentlyDeleteAllDeletedTasks() {
   });
 }
 
+export function permanentlyDeleteAllCompletedTasks() {
+  let completedTasks = _tasks.filter(task => task.completed === true && task.deleted === false);
+  completedTasks.forEach(task => {
+    permanentlyDeleteTask(task);
+  });
+}
+
 export function toggleCompleted(task) {
 
   task.completed = !task.completed;

@@ -133,6 +133,14 @@ window.electronAPI.purgeDeletedTasks(() => {
   tasks.permanentlyDeleteAllDeletedTasks();
   renderTasks();
 });
+window.electronAPI.purgeCompletedTasks(() => {
+  let result = confirm("Are you sure you want to permanently remove all completed tasks? This action cannot be undone.");
+  if (!result) {
+    return;
+  }
+  tasks.permanentlyDeleteAllCompletedTasks();
+  renderTasks();
+});
 
 /****************************************************************************
  * Methods
@@ -320,6 +328,9 @@ function selectNextTask(task) {
   selectTask(nextTask);
 }
 
+// TODO: the next selected behavior for deleted tasks is not consistent with the next selected
+// behavior for completed tasks. Change the deleted task behavior to act more like the completed
+// task behavior
 function getNextTaskToHighlight(task) {
   
   let indexOfTask = null;
