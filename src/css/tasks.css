@@ -2,8 +2,6 @@
   display: flex;
   align-items: center; /* Aligns items vertically */
   top: 24px;
-
-  background-color: var(--color-background);
   /* the below allows the input box to be always on top */
   width: var(--width-main-canvas);
   position: fixed;
@@ -153,6 +151,7 @@ of the parent .task element */
 
 #addTaskInputBox {
   flex: 1;
+  background-color: var(--color-background);
   border: 1px solid transparent;
   border-radius: 5px;
   box-shadow: none;
@@ -163,7 +162,6 @@ of the parent .task element */
 
 /* style to use if the "add task" input box has focus or has text */
 #addTaskInputBox:focus {
-  background-color: var(--color-background);
   border: 1px solid var(--color-purple);
   color: var(--color-primary-text) !important;
 }
