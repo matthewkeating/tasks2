@@ -1,13 +1,17 @@
-var _sidebarShown = false;
+import * as settings from './settings-model.js';
+
+var _sidebarShown = settings.sidebarVisibility === "sidebar-in";
 
 export function showSidebar() {
   window.electronAPI.showSidebar();
   _sidebarShown = true;
+  settings.setSidebarVisibility("sidebar-in");
 }
 
 export function hideSidebar() {
   window.electronAPI.hideSidebar();
   _sidebarShown = false;
+  settings.setSidebarVisibility("sidebar-out");
 }
 
 export function isShown() {
