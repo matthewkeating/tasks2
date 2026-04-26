@@ -216,7 +216,7 @@ function createMenuTemplate(mainWindow) {
       },
     },
     { type: 'separator' },
-    { label: 'Quit', role: 'quit' }
+    { label: 'Quit', role: 'quit', accelerator: 'CmdOrCtrl+Q' }
   ];
 
   return menuTemplate;
