@@ -1,4 +1,5 @@
 const { clipboard, Menu, shell } = require('electron/main');
+const { WIDTH_WITHOUT_SIDEBAR, WIDTH_WITH_SIDEBAR, MIN_HEIGHT, MAX_HEIGHT } = require('../config.js');
 
 // initialize menu settings object
 let menuSettings = {
@@ -23,15 +24,15 @@ function showHideTasks(mainWindow) {
 }
 
 function showSidebar(mainWindow) {
-  mainWindow.setMinimumSize(780, 518);
-  mainWindow.setMaximumSize(780, 1200);
-  mainWindow.setSize(780, mainWindow.getSize()[1], true);
+  mainWindow.setMinimumSize(WIDTH_WITH_SIDEBAR, MIN_HEIGHT);
+  mainWindow.setMaximumSize(WIDTH_WITH_SIDEBAR, MAX_HEIGHT);
+  mainWindow.setSize(WIDTH_WITH_SIDEBAR, mainWindow.getSize()[1], true);
 }
 
 function hideSidebar(mainWindow) {
-  mainWindow.setMinimumSize(480, 518);
-  mainWindow.setMaximumSize(480, 1200);
-  mainWindow.setSize(480, mainWindow.getSize()[1], true);
+  mainWindow.setMinimumSize(WIDTH_WITHOUT_SIDEBAR, MIN_HEIGHT);
+  mainWindow.setMaximumSize(WIDTH_WITHOUT_SIDEBAR, MAX_HEIGHT);
+  mainWindow.setSize(WIDTH_WITHOUT_SIDEBAR, mainWindow.getSize()[1], true);
 }
 
 function createMenuTemplate(mainWindow) {

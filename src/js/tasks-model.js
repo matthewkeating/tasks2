@@ -46,13 +46,6 @@ export function getTaskByIndex(index) {
   return null;
 }
 
-export function getNumTasks(includeCompleted) {
-  if (includeCompleted) {
-    return _tasks.length;
-  }
-  return _tasks.filter(task => task.completed === false).length;
-}
-
 export function getNumActiveTasks() {
   let array = _tasks.filter(task => task.deleted === false && task.completed === false);  // get the active tasks
   return array.length;

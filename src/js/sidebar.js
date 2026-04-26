@@ -79,21 +79,6 @@ function registerTwoFingerSwipe() {
 
 }
 
-function registerHotKeys() {
-
-  window.addEventListener("keydown", event => {
-    if (event.metaKey && event.shiftKey && event.code === "Period") {
-      event.preventDefault(); // optional: stop browser default behavior
-      showSidebar();
-    }
-    if (event.metaKey && event.shiftKey && event.code === "Comma") {
-      event.preventDefault(); // optional: stop browser default behavior
-      hideSidebar();
-    }
-  });
-
-}
-
 /*
  * This fuction binds/registers:
  *   - Right click and drag
@@ -104,6 +89,5 @@ export function registerGesturesAndHotKeys() {
 
   registerRightClickAndDrag();
   registerTwoFingerSwipe();
-  registerHotKeys();
 
 }

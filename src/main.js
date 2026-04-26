@@ -1,5 +1,6 @@
 const { app, BrowserWindow, globalShortcut, ipcMain, Menu, nativeImage, screen, shell, Tray } = require('electron/main');
 const { createMenuTemplate, showHideTasks, showSidebar, hideSidebar, updateMenuSettings } = require('./components/menu.js');
+const { WIDTH_WITHOUT_SIDEBAR, WIDTH_WITH_SIDEBAR, MIN_HEIGHT, MAX_HEIGHT } = require('./config.js');
 const log = require('electron-log');
 const path = require('node:path');
 const Store = require('./js/electron-store.js');
@@ -19,10 +20,10 @@ const createWindow = () => {
 
   // the app is designed be small and unobtrusive
   // set window size parameters to disallow users from making the window too big or too small
-  const minimumWidth = 480;
-  const maximumWidth = 780;
-  const minimumHeight = 518;
-  const maximumHeight = 1200;
+  const minimumWidth = WIDTH_WITHOUT_SIDEBAR;
+  const maximumWidth = WIDTH_WITH_SIDEBAR;
+  const minimumHeight = MIN_HEIGHT;
+  const maximumHeight = MAX_HEIGHT;
 
   // gather information about the user's screen size
   const primaryScreen = screen.getPrimaryDisplay()

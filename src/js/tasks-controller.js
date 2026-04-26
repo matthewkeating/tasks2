@@ -146,19 +146,6 @@ window.electronAPI.purgeCompletedTasks(() => {
  * Methods
  ****************************************************************************/
 
-function showSidebar() {
-  if (_selectedTask !== null) {
-    taskDetails.classList.remove("display-none");
-  }
-  _taskNotes.focus();
-  sidebar.showSidebar();
-}
-
-function hideSidebar() {
-  sidebar.hideSidebar();
-  taskDetails.classList.add("display-none");
-}
-
 function selectTask(task) {
 
   if (task === null) {
@@ -585,13 +572,8 @@ function getListItem(task){
   note.classList.add("icon-note");
   note.addEventListener("click", (event) => { _selectedTask = task; });
 
-  let quickActions = null;
-  if (settings.quickActionsVisibility === "never") {
-    quickActions = document.createElement("div");
-  } else {
-    quickActions = getQuickActions(task);
-    quickActions.classList.add("display-none");
-  }
+  let quickActions = getQuickActions(task);
+  quickActions.classList.add("display-none");
 
   // Add all of the above task elements to the task div
   taskDiv.appendChild(circle);

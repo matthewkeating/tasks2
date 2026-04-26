@@ -1,0 +1,6 @@
+module.exports = {
+  WIDTH_WITHOUT_SIDEBAR: 480,
+  WIDTH_WITH_SIDEBAR: 780,
+  MIN_HEIGHT: 518,
+  MAX_HEIGHT: 1200,
+};
