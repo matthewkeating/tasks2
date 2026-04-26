@@ -171,6 +171,9 @@ app.whenReady().then(() => {
   globalShortcut.register('CommandOrControl+Shift+\'', () => {
     showHideTasks(mainWindow);
   });
+  globalShortcut.register('CommandOrControl+Q', () => {
+    app.quit();
+  });
 
 });
 
