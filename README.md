@@ -110,8 +110,7 @@ None.
 None.
 
 ## Disclaimers
-* This software is beta.
-* Tasks was made with Electron using HTML, CSS, and JavaScript only. It was designed, developed, and tested exclusively on MacOS.
+* This software was designed, developed, and tested exclusively on/for macOS.
 
 ## Thank you
 * [Ariel Diaz](https://github.com/fullmetalbrackets) - For offering a solid HEX to CSS filter [conversion tool](https://cssfiltergenerator.lol/)
