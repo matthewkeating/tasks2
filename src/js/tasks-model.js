@@ -1,7 +1,11 @@
-let _tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let _tasks = [];
+
+export async function init() {
+  _tasks = await window.electronAPI.loadTasks();
+}
 
 export function saveTasks() {
-  localStorage.setItem("tasks", JSON.stringify(_tasks));
+  window.electronAPI.saveTasks(_tasks);
 };
 
 export function replaceTasks(newTaskArray) {

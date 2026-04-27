@@ -793,7 +793,7 @@ const getDragAfterElement = (container, y) => {
 /****************************************************************************
  * Page Initialization
  ****************************************************************************/
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
   // Due to importing this file into other js files, this event listener gets fired when the tasks page is not
   // loaded. This is a check (probably a hack) to prevent this from happening.
@@ -824,6 +824,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  await tasks.init();
   renderTasks();
   bindEvents();
 

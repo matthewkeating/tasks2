@@ -3,6 +3,7 @@ const { createMenuTemplate, showHideTasks, showSidebar, hideSidebar, updateMenuS
 const { WIDTH_WITHOUT_SIDEBAR, WIDTH_WITH_SIDEBAR, MIN_HEIGHT, MAX_HEIGHT } = require('./config.js');
 const log = require('electron-log');
 const path = require('node:path');
+const fs = require('node:fs');
 const Store = require('./js/electron-store.js');
 const store = new Store();
 const Utils = require('./js/utils.js');
@@ -122,6 +123,23 @@ const createWindow = () => {
 
   ipcMain.on('show-sidebar', () => { showSidebar(mainWindow); });
   ipcMain.on('hide-sidebar', () => { hideSidebar(mainWindow); });
+
+  // Tasks are stored at ~/Library/Application Support/tasks/tasks.json on macOS.
+  // This is a stable path that external tools (e.g. a Raycast extension) can read and write.
+  const tasksPath = path.join(app.getPath('userData'), 'tasks.json');
+
+  // ipcMain.handle is used here (instead of ipcMain.on) because the renderer needs
+  // to wait for the file contents to be returned before it can render the task list.
+  ipcMain.handle('load-tasks', () => {
+    if (!fs.existsSync(tasksPath)) return [];
+    return JSON.parse(fs.readFileSync(tasksPath, 'utf8'));
+  });
+
+  // ipcMain.on is used here (instead of ipcMain.handle) because saving is fire-and-forget —
+  // the renderer doesn't need to wait for confirmation that the write completed.
+  ipcMain.on('save-tasks', (event, tasks) => {
+    fs.writeFileSync(tasksPath, JSON.stringify(tasks));
+  });
 
   ipcMain.on("update-tray-labels", (event, { showingCompleted, showingDeleted }) => {
     updateMenuSettings("showing-completed", showingCompleted);

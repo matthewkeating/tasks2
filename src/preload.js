@@ -50,6 +50,11 @@ const api = {
     ipcRenderer.on('previous-task', callback);
   },
  
+  // task storage — invoke is used for loading (returns a promise with the data),
+  // send is used for saving (fire-and-forget, no return value needed)
+  loadTasks: () => ipcRenderer.invoke('load-tasks'),
+  saveTasks: (tasks) => ipcRenderer.send('save-tasks', tasks),
+
   // menu actions
   hideWindow: () => ipcRenderer.send('hide-window'),
   updateTrayLabels: (showingCompleted, showingDeleted) => ipcRenderer.send('update-tray-labels', { showingCompleted, showingDeleted }),
