@@ -125,6 +125,13 @@ window.electronAPI.selectPreviousTask(() => {
 window.electronAPI.deleteTask(() => {
   deleteTaskAndHighlightNextTask(_selectedTask);
 });
+window.electronAPI.onTasksChanged(async () => {
+  const selectedId = _selectedTask?.id ?? null;
+  await tasks.init();
+  renderTasks();
+  const reselect = selectedId ? tasks.getTasks(true, true, true).find(t => t.id === selectedId) : null;
+  selectTask(reselect ?? null);
+});
 window.electronAPI.purgeDeletedTasks(() => {
   let result = confirm("Are you sure you want to permanently remove all deleted tasks? This action cannot be undone.");
     if (!result) {

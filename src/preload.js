@@ -54,6 +54,10 @@ const api = {
   // send is used for saving (fire-and-forget, no return value needed)
   loadTasks: () => ipcRenderer.invoke('load-tasks'),
   saveTasks: (tasks) => ipcRenderer.send('save-tasks', tasks),
+  onTasksChanged: (callback) => {
+    ipcRenderer.removeAllListeners('tasks-changed');
+    ipcRenderer.on('tasks-changed', callback);
+  },
 
   // menu actions
   hideWindow: () => ipcRenderer.send('hide-window'),

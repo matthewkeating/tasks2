@@ -137,8 +137,27 @@ const createWindow = () => {
 
   // ipcMain.on is used here (instead of ipcMain.handle) because saving is fire-and-forget —
   // the renderer doesn't need to wait for confirmation that the write completed.
+  let appIsWriting = false;
   ipcMain.on('save-tasks', (event, tasks) => {
+    appIsWriting = true;
     fs.writeFileSync(tasksPath, JSON.stringify(tasks));
+  });
+
+  // Watch for external changes to tasks.json (e.g. from a Raycast extension).
+  // Watching the directory (rather than the file) works even if tasks.json doesn't exist yet.
+  // appIsWriting suppresses notifications for changes the app made itself.
+  // The debounce prevents multiple rapid firings from a single external write.
+  let watchDebounce = null;
+  fs.watch(path.dirname(tasksPath), (eventType, filename) => {
+    if (filename !== 'tasks.json' || eventType !== 'change') return;
+    if (appIsWriting) {
+      appIsWriting = false;
+      return;
+    }
+    clearTimeout(watchDebounce);
+    watchDebounce = setTimeout(() => {
+      if (mainWindow) mainWindow.webContents.send('tasks-changed');
+    }, 100);
   });
 
   ipcMain.on("update-tray-labels", (event, { showingCompleted, showingDeleted }) => {
