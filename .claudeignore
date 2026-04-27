@@ -1,3 +1,7 @@
 node_modules/
 .webpack/
 out/
+package-lock.json
+*.log
+assets/*.png
+assets/*.icns
