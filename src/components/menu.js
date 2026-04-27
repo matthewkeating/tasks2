@@ -1,4 +1,4 @@
-const { clipboard, Menu, shell } = require('electron/main');
+const { app, clipboard, Menu, shell } = require('electron/main');
 const { WIDTH_WITHOUT_SIDEBAR, WIDTH_WITH_SIDEBAR, MIN_HEIGHT, MAX_HEIGHT } = require('../config.js');
 
 // initialize menu settings object
@@ -208,7 +208,15 @@ function createMenuTemplate(mainWindow) {
       ]
     },
     { type: 'separator' },
-    { role: 'about' },
+    {
+      label: 'About Tasks',
+      click: () => {
+        // LSUIElement apps don't steal focus automatically, so we force it before
+        // showing the About dialog to ensure it appears in front of other windows.
+        app.focus({ steal: true });
+        app.showAboutPanel();
+      }
+    },
     {
       label: 'View Read Me (on GitHub)...',
       click: () => {
