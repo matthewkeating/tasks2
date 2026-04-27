@@ -81,12 +81,12 @@ Tasks allows you to show/hide the sidebar using gestures:
 * Using a trackpad, a two finger swipe right or left with show or hide the sidebar, respectively
 * Using a mouse, pressing and holding the right button, "swiping" right or left, and releasing will show or hide the sidebar, respectively
 
-### External Integrations (e.g. Raycast)
+### External Integrations
 Tasks stores all task data in a JSON file at:
 ```
 ~/Library/Application Support/Tasks/tasks.json
 ```
-This file can be read and written by external tools to create, complete, or delete tasks without opening the app. For example, a [Raycast](https://www.raycast.com) extension can read this file to list tasks or append a new task object to create one. The app will reflect any external changes the next time it is launched.
+This file can be read and written by external tools to modify the task list. For example, the [Tasks — Raycast Extension](https://github.com/matthewkeating/tasks-raycast-extension) is a [Raycast](https://www.raycast.com) extension that can read this file and create, complete, flag, or delete tasks without opening the app.
 
 The file contains a JSON array of task objects with the following structure:
 ```json
