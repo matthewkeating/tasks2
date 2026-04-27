@@ -91,7 +91,6 @@ of the parent .task element */
 
 .task-selected {
   background-color: var(--color-selected) !important;
-  font-weight: bold;
 }
 
 .task-empty {
@@ -178,7 +177,7 @@ of the parent .task element */
   top: 0px;
   left: 480px;
   width: 300px;
-  padding: 40px 20px 20px 20px;
+  padding: 24px 20px 20px 20px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
