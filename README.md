@@ -101,7 +101,7 @@ The file contains a JSON array of task objects with the following structure:
 ```
 
 ### Mobile Support and Syncing Across Devices
-Tasks does ***not*** support mobile or sync data across devices. These features are not a important to me but I may add them in the future as I recognize their importance to some.
+Tasks does ***not*** support mobile or sync data across devices. These features are not a important to me but I may add them in the future as I recognize there importance to some.
 
 ## To Dos
 None.
