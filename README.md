@@ -63,7 +63,6 @@ Per the tables below, Tasks provides application-wide keyboard shortcuts.
 | ⌘ ⇧ D            | Show/Hide deleted tasks   |
 | ⌘ ⇧ [            | Previous task        |
 
-
 #### Task Shortcuts
 
 | Shortcut         | Action               |
@@ -81,7 +80,14 @@ Tasks allows you to show/hide the sidebar using gestures:
 * Using a trackpad, a two finger swipe right or left with show or hide the sidebar, respectively
 * Using a mouse, pressing and holding the right button, "swiping" right or left, and releasing will show or hide the sidebar, respectively
 
-### External Integrations
+## Building
+
+1. Clone the repo.
+2. Run `npm run make`.
+
+For more detailed build instructions, see [install-instructions.md](install-instructions.md).
+
+## External Integrations
 Tasks stores all task data in a JSON file at:
 ```
 ~/Library/Application Support/Tasks/tasks.json
