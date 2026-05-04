@@ -96,6 +96,12 @@ function bindEvents() {
 
   });
 
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      window.electronAPI.hideWindow();
+    }
+  });
+
 }
 
 /****************************************************************************
