@@ -83,13 +83,9 @@ Tasks allows you to show/hide the sidebar using gestures:
 ## Building
 
 1. Clone the repo.
-<<<<<<< HEAD
 2. Run `npm run make`.
 
 For more detailed build instructions, see [install-instructions.md](install-instructions.md).
-=======
-2. Run `npm run make`. 
->>>>>>> 4ed93c0 (Updated build instructions.)
 
 ## External Integrations
 Tasks stores all task data in a JSON file at:

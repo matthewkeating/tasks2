@@ -5,7 +5,8 @@ const { WIDTH_WITHOUT_SIDEBAR, WIDTH_WITH_SIDEBAR, MIN_HEIGHT, MAX_HEIGHT } = re
 let menuSettings = {
   "showing-completed": false,
   "showing-deleted": false,
-  "window-active": false
+  "window-active": false,
+  "sidebar-visible": false
 };
 
 function updateMenuSettings(setting, value) {
@@ -33,6 +34,14 @@ function hideSidebar(mainWindow) {
   mainWindow.setMinimumSize(WIDTH_WITHOUT_SIDEBAR, MIN_HEIGHT);
   mainWindow.setMaximumSize(WIDTH_WITHOUT_SIDEBAR, MAX_HEIGHT);
   mainWindow.setSize(WIDTH_WITHOUT_SIDEBAR, mainWindow.getSize()[1], true);
+}
+
+function toggleSidebar(mainWindow) {
+  if (mainWindow.getSize()[0] === WIDTH_WITH_SIDEBAR) {
+    hideSidebar(mainWindow);
+  } else {
+    showSidebar(mainWindow);
+  }
 }
 
 function createMenuTemplate(mainWindow) {
@@ -69,16 +78,10 @@ function createMenuTemplate(mainWindow) {
       visible: true,
       submenu: [
         {
-          id: 'show-sidebar',
-          label: 'Show Sidebar',
-          click: () => { showSidebar(mainWindow); },
+          id: 'toggle-sidebar',
+          label: 'Toggle Sidebar',
+          click: () => { toggleSidebar(mainWindow); },
           accelerator: 'CmdOrCtrl+Shift+.',
-        },
-        {
-          id: 'hide-sidebar',
-          label: 'Hide Sidebar',
-          click: () => { hideSidebar(mainWindow); },
-          accelerator: 'CmdOrCtrl+Shift+,',
         },
         { type: 'separator' },
         {
@@ -231,4 +234,4 @@ function createMenuTemplate(mainWindow) {
 
 }
 
-module.exports = { createMenuTemplate, showHideTasks, showSidebar, hideSidebar, updateMenuSettings };
+module.exports = { createMenuTemplate, showHideTasks, showSidebar, hideSidebar, toggleSidebar, updateMenuSettings };
