@@ -1,4 +1,4 @@
-const { app, clipboard, Menu, shell } = require('electron/main');
+const { app, clipboard, Menu, screen, shell } = require('electron/main');
 const { WIDTH_WITHOUT_SIDEBAR, WIDTH_WITH_SIDEBAR, MIN_HEIGHT, MAX_HEIGHT } = require('../config.js');
 
 // initialize menu settings object
@@ -15,10 +15,32 @@ function updateMenuSettings(setting, value) {
 
 function showHideTasks(mainWindow) {
   if (mainWindow.isVisible()) {
-    // hide window
     mainWindow.hide();
   } else {
-    // show window
+    const cursorDisplay = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+    const bounds = mainWindow.getBounds();
+    const windowDisplay = screen.getDisplayNearestPoint({
+      x: bounds.x + bounds.width / 2,
+      y: bounds.y + bounds.height / 2,
+    });
+
+    if (windowDisplay.id !== cursorDisplay.id) {
+      // The window is on a different display than the cursor.
+      // Translate its position proportionally: compute where the window sits
+      // as a fraction of the source display's work area, then apply that same
+      // fraction to the destination display. This preserves the window's
+      // relative position (e.g. top-right stays top-right) across monitors
+      // of different sizes.
+      const src = windowDisplay.workArea;
+      const dst = cursorDisplay.workArea;
+      const relX = (bounds.x - src.x) / src.width;
+      const relY = (bounds.y - src.y) / src.height;
+      mainWindow.setPosition(
+        Math.round(dst.x + relX * dst.width),
+        Math.round(dst.y + relY * dst.height)
+      );
+    }
+
     mainWindow.show();
     mainWindow.focus();
   }
