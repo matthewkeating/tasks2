@@ -221,7 +221,7 @@ function createMenuTemplate(mainWindow) {
       }
     },
     {
-      label: 'View Read Me (on GitHub)...',
+      label: 'View README (on GitHub)...',
       click: () => {
         shell.openExternal("https://github.com/matthewkeating/tasks2");
       },
