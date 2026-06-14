@@ -1,7 +1,7 @@
 {
   "name": "tasks",
   "productName": "Tasks",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A not so creatively named application for managing a task list.",
   "main": "src/main.js",
   "scripts": {
