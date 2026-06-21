@@ -8,6 +8,31 @@ const Store = require('./js/electron-store.js');
 const store = new Store();
 const Utils = require('./js/utils.js');
 const utils = new Utils();
+const { db } = require('./firebase.js');
+const { collection, doc, writeBatch, onSnapshot } = require('firebase/firestore');
+
+// Placeholder until Firebase Authentication is added (see: https://firebase.google.com/docs/auth).
+// At that point, replace with the signed-in user's UID so each user's tasks are isolated.
+const FIREBASE_USER_ID = 'default';
+const firestoreTaskIds = new Set();
+
+// Writes the full task list to Firestore as individual documents using a single batch commit.
+// updatedAt is used for last-write-wins conflict resolution when both devices edit the same task.
+// Also deletes any Firestore documents whose IDs are no longer in the task list (e.g. after a purge).
+async function syncTasksToFirestore(tasks) {
+  const tasksCol = collection(db, 'users', FIREBASE_USER_ID, 'tasks');
+  const batch = writeBatch(db);
+  const currentIds = new Set(tasks.map(t => t.id));
+
+  for (const task of tasks) {
+    batch.set(doc(tasksCol, task.id), { ...task, updatedAt: Date.now() });
+  }
+  for (const id of firestoreTaskIds) {
+    if (!currentIds.has(id)) batch.delete(doc(tasksCol, id));
+  }
+
+  await batch.commit();
+}
 
 let mainWindow = null;
 let tray = null;
@@ -141,6 +166,9 @@ const createWindow = () => {
   ipcMain.on('save-tasks', (event, tasks) => {
     appIsWriting = true;
     fs.writeFileSync(tasksPath, JSON.stringify(tasks));
+    // Sync to Firestore after writing locally. Fire-and-forget — errors go to the log
+    // so a Firestore outage doesn't block the user from saving tasks locally.
+    syncTasksToFirestore(tasks).catch(err => log.error('Firestore sync failed:', err));
   });
 
   // Watch for external changes to tasks.json (e.g. from a Raycast extension).
@@ -158,6 +186,60 @@ const createWindow = () => {
     watchDebounce = setTimeout(() => {
       if (mainWindow) mainWindow.webContents.send('tasks-changed');
     }, 100);
+  });
+
+  // Listen for task changes pushed from other devices (e.g. the Android app).
+  // Firestore calls this listener immediately on attach (initial snapshot) and again
+  // whenever a document in the collection changes.
+  const tasksCol = collection(db, 'users', FIREBASE_USER_ID, 'tasks');
+  onSnapshot(tasksCol, (snapshot) => {
+    // Keep firestoreTaskIds current so syncTasksToFirestore knows which docs to delete.
+    snapshot.docChanges().forEach(change => {
+      if (change.type === 'removed') firestoreTaskIds.delete(change.doc.id);
+      else firestoreTaskIds.add(change.doc.id);
+    });
+
+    // hasPendingWrites is true when the change originated on this device.
+    // Filtering these out prevents us from processing our own writes as if they were remote.
+    const remoteChanges = snapshot.docChanges().filter(
+      change => !change.doc.metadata.hasPendingWrites
+    );
+    if (remoteChanges.length === 0) return;
+
+    let localTasks = [];
+    if (fs.existsSync(tasksPath)) {
+      localTasks = JSON.parse(fs.readFileSync(tasksPath, 'utf8'));
+    }
+
+    // Merge remote changes into local tasks using last-write-wins (by updatedAt).
+    // Tasks without updatedAt (created before Firestore sync was added) treat as 0,
+    // so any remote version with a real timestamp takes precedence.
+    const localMap = new Map(localTasks.map(t => [t.id, t]));
+    for (const change of remoteChanges) {
+      if (change.type === 'removed') {
+        localMap.delete(change.doc.id);
+      } else {
+        const remoteTask = change.doc.data();
+        const localTask = localMap.get(remoteTask.id);
+        if (!localTask || (remoteTask.updatedAt ?? 0) > (localTask.updatedAt ?? 0)) {
+          localMap.set(remoteTask.id, remoteTask);
+        }
+      }
+    }
+
+    // Preserve the local task order, excluding any tasks removed above.
+    // New tasks from remote are appended at the end.
+    const knownIds = new Set(localTasks.map(t => t.id));
+    const updatedTasks = localTasks.filter(t => localMap.has(t.id)).map(t => localMap.get(t.id));
+    for (const [id, task] of localMap) {
+      if (!knownIds.has(id)) updatedTasks.push(task);
+    }
+
+    // Setting appIsWriting suppresses the fs.watch notification for this write,
+    // since the renderer will be notified directly on the next line.
+    appIsWriting = true;
+    fs.writeFileSync(tasksPath, JSON.stringify(updatedTasks));
+    if (mainWindow) mainWindow.webContents.send('tasks-changed');
   });
 
   ipcMain.on("update-tray-labels", (event, { showingCompleted, showingDeleted }) => {

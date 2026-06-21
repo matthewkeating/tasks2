@@ -80,10 +80,35 @@ Tasks allows you to show/hide the sidebar using gestures:
 * Using a trackpad, a two finger swipe right or left with show or hide the sidebar, respectively
 * Using a mouse, pressing and holding the right button, "swiping" right or left, and releasing will show or hide the sidebar, respectively
 
+## Configuration
+
+Tasks uses Google Firestore for cross-device sync. Before building, you must create a Firebase project and provide its configuration.
+
+### Prerequisites
+1. Create a [Firebase project](https://console.firebase.google.com) (free Spark plan is sufficient).
+2. In your project, go to **Build → Firestore Database** and create a database. Choose **Start in test mode** for development; switch to production mode and add security rules before sharing the app.
+3. Go to **Project settings** (gear icon) → scroll to **Your apps** → click the **</>** (web) icon to register a web app.
+4. Copy the `firebaseConfig` object shown.
+
+### Creating `firebase-config.js`
+Create `src/firebase-config.js` with the values from the Firebase Console:
+```js
+module.exports = {
+  apiKey: "...",
+  authDomain: "...",
+  projectId: "...",
+  storageBucket: "...",
+  messagingSenderId: "...",
+  appId: "..."
+};
+```
+This file is listed in `.gitignore` and will not be committed to the repository.
+
 ## Building
 
 1. Clone the repo.
-2. Run `npm run make`.
+2. Create `src/firebase-config.js` as described in [Configuration](#configuration).
+3. Run `npm run make`.
 
 For more detailed build instructions, see [install-instructions.md](install-instructions.md).
 
@@ -102,12 +127,14 @@ The file contains a JSON array of task objects with the following structure:
   "flagged": false,
   "completed": false,
   "deleted": false,
-  "notes": null
+  "notes": null,
+  "updatedAt": 1718000000000
 }
 ```
+The `updatedAt` field is a Unix timestamp (milliseconds) added automatically on each save. It is used for conflict resolution when syncing with Firestore.
 
 ### Mobile Support and Syncing Across Devices
-Tasks does ***not*** support mobile or sync data across devices. These features are not a important to me but I may add them in the future as I recognize there importance to some.
+Tasks syncs task data to [Google Firestore](https://firebase.google.com/docs/firestore) so that changes made on macOS are reflected on Android and vice versa. Sync requires a Firebase project and a `src/firebase-config.js` file — see [Configuration](#configuration) below.
 
 ## To Dos
 None.
