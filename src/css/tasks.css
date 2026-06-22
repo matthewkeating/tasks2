@@ -26,7 +26,7 @@
 
 .tab-active, .tab-active:hover {
   color: var(--color-primary-text);
-  background-color: var(--color-input);
+  background-color: var(--color-action-separator);
   border-radius: 5px;
   position: relative;
 }
@@ -200,7 +200,7 @@ of the parent .task element */
 
 /* style to use if the "add task" input box has focus or has text */
 #addTaskInputBox:focus {
-  border: 1px solid var(--color-selected);
+  border: 1px solid var(--color-purple);
   color: var(--color-primary-text) !important;
 }
 

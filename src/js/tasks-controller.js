@@ -851,6 +851,7 @@ function selectTab(listName) {
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('tab-active', t.dataset.list === listName));
   deselectTask(_selectedTask);
   renderTasks();
+  _addTaskInputBox.focus();
 }
 
 document.querySelectorAll('.tab').forEach(tab => {
