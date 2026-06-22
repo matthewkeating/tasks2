@@ -1,5 +1,5 @@
 const { app, BrowserWindow, globalShortcut, ipcMain, Menu, nativeImage, screen, shell, Tray } = require('electron/main');
-const { createMenuTemplate, showHideTasks, showSidebar, hideSidebar, updateMenuSettings } = require('./components/menu.js');
+const { createMenuTemplate, showHideTasks, showSidebar, hideSidebar, centerOnDisplay, updateMenuSettings } = require('./components/menu.js');
 const { WIDTH_WITHOUT_SIDEBAR, WIDTH_WITH_SIDEBAR, MIN_HEIGHT, MAX_HEIGHT } = require('./config.js');
 const log = require('electron-log');
 const path = require('node:path');
@@ -8,31 +8,15 @@ const Store = require('./js/electron-store.js');
 const store = new Store();
 const Utils = require('./js/utils.js');
 const utils = new Utils();
-const { db } = require('./firebase.js');
-const { collection, doc, writeBatch, onSnapshot } = require('firebase/firestore');
+const { syncTasks, watchTasks } = require('./firebase.js');
+const { randomUUID } = require('node:crypto');
 
 // Placeholder until Firebase Authentication is added (see: https://firebase.google.com/docs/auth).
-// At that point, replace with the signed-in user's UID so each user's tasks are isolated.
+// Replace with the signed-in user's UID when auth is wired up.
 const FIREBASE_USER_ID = 'default';
-const firestoreTaskIds = new Set();
-
-// Writes the full task list to Firestore as individual documents using a single batch commit.
-// updatedAt is used for last-write-wins conflict resolution when both devices edit the same task.
-// Also deletes any Firestore documents whose IDs are no longer in the task list (e.g. after a purge).
-async function syncTasksToFirestore(tasks) {
-  const tasksCol = collection(db, 'users', FIREBASE_USER_ID, 'tasks');
-  const batch = writeBatch(db);
-  const currentIds = new Set(tasks.map(t => t.id));
-
-  for (const task of tasks) {
-    batch.set(doc(tasksCol, task.id), { ...task, updatedAt: Date.now() });
-  }
-  for (const id of firestoreTaskIds) {
-    if (!currentIds.has(id)) batch.delete(doc(tasksCol, id));
-  }
-
-  await batch.commit();
-}
+// Regenerated each session so server-acknowledgement events for our own Firestore writes
+// are not mistaken for remote changes from another device.
+const deviceId = randomUUID();
 
 let mainWindow = null;
 let tray = null;
@@ -58,34 +42,11 @@ const createWindow = () => {
   const screenWidth = screenDimensions.width;
   const screenHeight = screenDimensions.height;
 
-  // set sensible defaults for window size and position
-  let width = minimumWidth;
-  let height = 800;
-  let x = (screenWidth - width) / 2;
-  let y = ((screenHeight - height) / 2) + menuBarHeight;
-  
-  // override defaults if the window has previously been positioned by the user
-  const windowBounds = store.get('windowBounds');
-  if (windowBounds !== undefined) {
-    // set the window position and height using the values on the last application exit
-    width = windowBounds.width;
-    height = windowBounds.height;
-
-    // make sure the previous window position is inside the screen (this is important for users that use multiple monitors)
-    const windowUpperLeft = [windowBounds.x, windowBounds.y];
-    const screenRectangle = [[0, 0], [screenWidth-width, screenHeight-height+menuBarHeight]]
-    const isWindowPositionedInScreen = utils.isPointInRectangle(windowUpperLeft, screenRectangle);
-
-    if (isWindowPositionedInScreen) {
-      // move the window to its previous position
-      x = windowBounds.x;
-      y = windowBounds.y;
-    } else {
-      // center the window to the screen
-      y = Math.round(((screenHeight - windowBounds.height) / 2) + menuBarHeight);
-    }
-
-  }
+  // always center the window on the primary display
+  const width = minimumWidth;
+  const height = 800;
+  const x = Math.round((screenWidth - width) / 2);
+  const y = Math.round(((screenHeight - height) / 2) + menuBarHeight);
 
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -100,6 +61,7 @@ const createWindow = () => {
     y: y,
 
     resizable: false,
+    movable: false,
     frame: false,
     show: false,  // don't show the window until the html is loaded (see the 'ready-to-show' method below)
 
@@ -138,9 +100,18 @@ const createWindow = () => {
     });
   }
 
-  mainWindow.on('close', () => {
-    store.set('windowBounds', mainWindow.getBounds());
+  screen.on('display-metrics-changed', () => {
+    if (!mainWindow) return;
+    const bounds = mainWindow.getBounds();
+    const currentDisplay = screen.getDisplayNearestPoint({
+      x: bounds.x + bounds.width / 2,
+      y: bounds.y + bounds.height / 2,
+    });
+    centerOnDisplay(mainWindow, currentDisplay);
   });
+
+  screen.on('display-added', () => { if (mainWindow) mainWindow.center(); });
+  screen.on('display-removed', () => { if (mainWindow) mainWindow.center(); });
 
   ipcMain.on('hide-window', (event) => {
     mainWindow.hide();
@@ -163,12 +134,16 @@ const createWindow = () => {
   // ipcMain.on is used here (instead of ipcMain.handle) because saving is fire-and-forget —
   // the renderer doesn't need to wait for confirmation that the write completed.
   let appIsWriting = false;
+  let firestoreSyncDebounce = null;
   ipcMain.on('save-tasks', (event, tasks) => {
     appIsWriting = true;
     fs.writeFileSync(tasksPath, JSON.stringify(tasks));
-    // Sync to Firestore after writing locally. Fire-and-forget — errors go to the log
-    // so a Firestore outage doesn't block the user from saving tasks locally.
-    syncTasksToFirestore(tasks).catch(err => log.error('Firestore sync failed:', err));
+    // Debounce Firestore sync — the notes editor fires save-tasks on every keystroke,
+    // so we wait for 2s of inactivity before writing to Firestore.
+    clearTimeout(firestoreSyncDebounce);
+    firestoreSyncDebounce = setTimeout(() => {
+      syncTasks(FIREBASE_USER_ID, tasks, deviceId).catch(err => log.error('[Firebase] Sync failed:', err));
+    }, 2000);
   });
 
   // Watch for external changes to tasks.json (e.g. from a Raycast extension).
@@ -189,23 +164,8 @@ const createWindow = () => {
   });
 
   // Listen for task changes pushed from other devices (e.g. the Android app).
-  // Firestore calls this listener immediately on attach (initial snapshot) and again
-  // whenever a document in the collection changes.
-  const tasksCol = collection(db, 'users', FIREBASE_USER_ID, 'tasks');
-  onSnapshot(tasksCol, (snapshot) => {
-    // Keep firestoreTaskIds current so syncTasksToFirestore knows which docs to delete.
-    snapshot.docChanges().forEach(change => {
-      if (change.type === 'removed') firestoreTaskIds.delete(change.doc.id);
-      else firestoreTaskIds.add(change.doc.id);
-    });
-
-    // hasPendingWrites is true when the change originated on this device.
-    // Filtering these out prevents us from processing our own writes as if they were remote.
-    const remoteChanges = snapshot.docChanges().filter(
-      change => !change.doc.metadata.hasPendingWrites
-    );
-    if (remoteChanges.length === 0) return;
-
+  // onChange is only called for genuine remote changes — see firebase.js for filtering details.
+  watchTasks(FIREBASE_USER_ID, deviceId, (snapshot, remoteChanges) => {
     let localTasks = [];
     if (fs.existsSync(tasksPath)) {
       localTasks = JSON.parse(fs.readFileSync(tasksPath, 'utf8'));
@@ -219,7 +179,7 @@ const createWindow = () => {
       if (change.type === 'removed') {
         localMap.delete(change.doc.id);
       } else {
-        const remoteTask = change.doc.data();
+        const { _deviceId, ...remoteTask } = change.doc.data();
         const localTask = localMap.get(remoteTask.id);
         if (!localTask || (remoteTask.updatedAt ?? 0) > (localTask.updatedAt ?? 0)) {
           localMap.set(remoteTask.id, remoteTask);

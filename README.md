@@ -1,7 +1,5 @@
 # Tasks
-A task management application that runs from the MacOS menu bar.
-
-This is a lighter weight version of [Tasks](https://github.com/matthewkeating/tasks) focused on providing everything you need and nothing you don't.
+A task management application that runs from the macOS menu bar and stores task information in Firestore.
 
 ## Introduction
 
@@ -21,27 +19,24 @@ The aim of this project is to create a task list manager that:
 * Provides a minimalist/streamlined user interface
 
 ## Features
-Unlike [the "bigger" version of Tasks](https://github.com/matthewkeating/tasks), this version only provides the basics.
 
 ### Task Management
-By design, Tasks supports only one task list. This means users cannot, for example, create lists for Personal, Office, Grocery, etc. Tasks does, however, provide a small set of options for managing your task list.
+By design, Tasks supports two task lists: Work and Personal. Tasks also only provides a small set of options for managing your task list.
 
 #### Flagged Tasks
-Flagging a task changes the task color, making it more noticeable.
-> [!TIP]
-> Flags are useful for drawing attention to high priority tasks.
+Flagged tasks change color, making it more noticeable.
 
 #### Completed Tasks
-Completed tasks are, naturally, those tasks marked as complete.
+Completed tasks are, naturally, those tasks marked as complete. Completed tasks are organzied under a `Completed` section in the app.
 
 #### Deleted Tasks
-Unsurprisingly, manually deleted tasks (included completed tasks) go to Deleted.
+Deleted tasks are, naturally, those tasks that have been deleted. Deleted tasks are organzied under a `Deleted` section in the app.
 
 #### Task Ordering/Reordering
-Task ordering is important for prioritizing and maintaining focus. In Tasks, by design, completed and deleted tasks cannot be reordered. The most recent completed (or deleted) tasks are placed to the top of the completed (or deleted) lists.
+Task ordering is important for prioritizing and organizing work. In Tasks, by design, completed and deleted tasks cannot be reordered. The most recent completed (or deleted) tasks are placed to the top of the completed (or deleted) lists.
 
 #### Notes
-Each task can have associated notes. The editor supports headings; ordered and unordered lists; checklists; hyperlinks; as well as bold, italics, underline, and other font decoration.
+Each task can have associated plain text notes.
 
 #### Light and Dark Themes
 Tasks has two themes: light and dark.
@@ -56,12 +51,12 @@ Per the tables below, Tasks provides application-wide keyboard shortcuts.
 
 | Shortcut         | Action               |
 |------------------|----------------------|
-| ⌘ ⇧ '            | Show/Hide application|
-| ⌘ ⇧ .            | Show sidebar         |
-| ⌘ ⇧ ,            | Hide sidebar         |
-| ⌘ ⇧ C            | Show/Hide completed tasks |
-| ⌘ ⇧ D            | Show/Hide deleted tasks   |
-| ⌘ ⇧ [            | Previous task        |
+| ⌘ ⇧ '            | Show/Hide application         |
+| ⌘ 1              | Navigate to the Work list     |
+| ⌘ 2              | Navigate to the Personal list |
+| ⌘ ⇧ .            | Show/Hide notes sidebar       |
+| ⌘ ⇧ C            | Show/Hide completed tasks     |
+| ⌘ ⇧ D            | Show/Hide deleted tasks       |
 
 #### Task Shortcuts
 
@@ -111,30 +106,6 @@ This file is listed in `.gitignore` and will not be committed to the repository.
 3. Run `npm run make`.
 
 For more detailed build instructions, see [install-instructions.md](install-instructions.md).
-
-## External Integrations
-Tasks stores all task data in a JSON file at:
-```
-~/Library/Application Support/Tasks/tasks.json
-```
-This file can be read and written by external tools to modify the task list. For example, the [Tasks — Raycast Extension](https://github.com/matthewkeating/tasks-raycast-extension) is a [Raycast](https://www.raycast.com) extension that can read this file and create, complete, flag, or delete tasks without opening the app.
-
-The file contains a JSON array of task objects with the following structure:
-```json
-{
-  "id": "unique-id",
-  "title": "Task title",
-  "flagged": false,
-  "completed": false,
-  "deleted": false,
-  "notes": null,
-  "updatedAt": 1718000000000
-}
-```
-The `updatedAt` field is a Unix timestamp (milliseconds) added automatically on each save. It is used for conflict resolution when syncing with Firestore.
-
-### Mobile Support and Syncing Across Devices
-Tasks syncs task data to [Google Firestore](https://firebase.google.com/docs/firestore) so that changes made on macOS are reflected on Android and vice versa. Sync requires a Firebase project and a `src/firebase-config.js` file — see [Configuration](#configuration) below.
 
 ## To Dos
 None.

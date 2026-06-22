@@ -1,7 +1,46 @@
+.tab-container {
+  display: flex;
+  width: var(--width-main-canvas);
+  position: fixed;
+  top: 24px;
+  z-index: 900;
+  background-color: var(--color-background);
+  padding: 0 6px;
+  box-sizing: border-box;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  margin: 2px;
+  padding: 10px 0 10px 0;
+  cursor: pointer;
+  color: var(--color-task-action-text);
+  font-size: 81%;
+  text-transform: uppercase;
+}
+
+.tab:hover {
+  color: var(--color-secondary-text);
+}
+
+.tab-active, .tab-active:hover {
+  color: var(--color-primary-text);
+  background-color: var(--color-input);
+  border-radius: 5px;
+  position: relative;
+}
+
+.tab-drag-over {
+  color: var(--color-primary-text);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 5px;
+}
+
 .input-box-container {
   display: flex;
   align-items: center; /* Aligns items vertically */
-  top: 24px;
+  top: 80px;
   /* the below allows the input box to be always on top */
   width: var(--width-main-canvas);
   position: fixed;
@@ -60,7 +99,7 @@ of the parent .task element */
 
 .task-list {
   width: var(--width-main-canvas);
-  padding-top: 20px;
+  padding-top: 44px;
   display: flex;
   flex-direction: column;
 }
@@ -161,7 +200,7 @@ of the parent .task element */
 
 /* style to use if the "add task" input box has focus or has text */
 #addTaskInputBox:focus {
-  border: 1px solid var(--color-purple);
+  border: 1px solid var(--color-selected);
   color: var(--color-primary-text) !important;
 }
 
@@ -170,7 +209,7 @@ of the parent .task element */
 }
 
 #listTasksArea {
-  margin: 30px 0px 0px 0px;
+  margin: 58px 0px 0px 0px;
 }
 
 #taskDetails {
@@ -204,81 +243,20 @@ of the parent .task element */
 
 #notesTextArea {
   background: var(--color-sidebar);
+  border: none;
+  outline: none;
   resize: none;
+  flex: 1;
   margin-left: 8px;
-  padding-right: 20px;
-  width: 260px;
+  padding: 0px;
+  width: 252px;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  -webkit-user-select: text;
+  user-select: text;
 }
 
-.ql-editor li[data-list=checked] > .ql-ui:before,
-.ql-editor li[data-list=unchecked] > .ql-ui:before
-{
-  font-size: 136% !important;
-  font-weight: 600 !important;
-  margin-left: -1.6rem !important; 
-  margin-top: -1.4rem !important; 
-}
-
-.ql-editor {
-  padding: 0px !important;
-  tab-size: 2 !important;
-}
-
-div.ql-editor.ql-blank::before {
-  left: 0px !important;
-}
-
-.ql-editor.ql-blank::before {
-  color: var(--color-task-action-text) !important; /* Change this to your desired color */
-  font-style: normal !important;
-}
-
-.ql-editor ul, .ql-editor ol, .ql-editor li {
-  padding-left: .6rem !important; /* Adjust this value to change the base indent */
-}
-
-.ql-editor li.ql-indent-1 {
-  padding-left: 1.2rem !important; /* Adjust for first level indent */
-}
-
-.ql-editor li.ql-indent-2 {
-  padding-left: 1.8rem !important; /* Adjust for second level indent */
-}
-
-.ql-editor li.ql-indent-3 {
-  padding-left: 2.4rem !important; /* Adjust for second level indent */
-}
-
-.ql-editor li.ql-indent-4 {
-  padding-left: 3.0rem !important; /* Adjust for second level indent */
-}
-
-.ql-editor li.ql-indent-5 {
-  padding-left: 3.6rem !important; /* Adjust for first level indent */
-}
-
-.ql-editor li.ql-indent-6 {
-  padding-left: 4.2rem !important; /* Adjust for second level indent */
-}
-
-.ql-editor li.ql-indent-7 {
-  padding-left: 4.8rem !important; /* Adjust for second level indent */
-}
-
-.ql-editor li.ql-indent-8 {
-  padding-left: 5.4rem !important; /* Adjust for second level indent */
-}
-
-.ql-editor li.ql-indent-9 {
-  padding-left: 6.0 rem !important; /* Adjust for second level indent */
-}
-
-.ql-editor a {
-  color: var(--color-purple);
-  text-decoration: none !important;
-}
-
-.ql-editor a:not(.ql-close)::before,
-.ql-editor a:not(.ql-close)::after {
-  display: none !important;
+#notesTextArea::placeholder {
+  color: var(--color-task-action-text);
 }

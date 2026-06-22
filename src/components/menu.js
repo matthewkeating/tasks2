@@ -13,49 +13,55 @@ function updateMenuSettings(setting, value) {
   menuSettings[setting] = value;
 }
 
+function centerOnDisplay(mainWindow, display) {
+  const { workArea } = display;
+  const [w, h] = mainWindow.getSize();
+  mainWindow.setPosition(
+    Math.round(workArea.x + (workArea.width - w) / 2),
+    Math.round(workArea.y + (workArea.height - h) / 2)
+  );
+}
+
 function showHideTasks(mainWindow) {
   if (mainWindow.isVisible()) {
     mainWindow.hide();
   } else {
     const cursorDisplay = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
-    const bounds = mainWindow.getBounds();
-    const windowDisplay = screen.getDisplayNearestPoint({
-      x: bounds.x + bounds.width / 2,
-      y: bounds.y + bounds.height / 2,
-    });
-
-    if (windowDisplay.id !== cursorDisplay.id) {
-      // The window is on a different display than the cursor.
-      // Translate its position proportionally: compute where the window sits
-      // as a fraction of the source display's work area, then apply that same
-      // fraction to the destination display. This preserves the window's
-      // relative position (e.g. top-right stays top-right) across monitors
-      // of different sizes.
-      const src = windowDisplay.workArea;
-      const dst = cursorDisplay.workArea;
-      const relX = (bounds.x - src.x) / src.width;
-      const relY = (bounds.y - src.y) / src.height;
-      mainWindow.setPosition(
-        Math.round(dst.x + relX * dst.width),
-        Math.round(dst.y + relY * dst.height)
-      );
-    }
-
+    centerOnDisplay(mainWindow, cursorDisplay);
     mainWindow.show();
     mainWindow.focus();
   }
 }
 
+function getWindowDisplay(mainWindow) {
+  const { x, y, width, height } = mainWindow.getBounds();
+  return screen.getDisplayNearestPoint({ x: x + width / 2, y: y + height / 2 });
+}
+
 function showSidebar(mainWindow) {
   mainWindow.setMinimumSize(WIDTH_WITH_SIDEBAR, MIN_HEIGHT);
   mainWindow.setMaximumSize(WIDTH_WITH_SIDEBAR, MAX_HEIGHT);
-  mainWindow.setSize(WIDTH_WITH_SIDEBAR, mainWindow.getSize()[1], true);
+  const [, h] = mainWindow.getSize();
+  const { workArea } = getWindowDisplay(mainWindow);
+  mainWindow.setBounds({
+    x: Math.round(workArea.x + (workArea.width - WIDTH_WITH_SIDEBAR) / 2),
+    y: Math.round(workArea.y + (workArea.height - h) / 2),
+    width: WIDTH_WITH_SIDEBAR,
+    height: h,
+  }, true);
 }
 
 function hideSidebar(mainWindow) {
   mainWindow.setMinimumSize(WIDTH_WITHOUT_SIDEBAR, MIN_HEIGHT);
   mainWindow.setMaximumSize(WIDTH_WITHOUT_SIDEBAR, MAX_HEIGHT);
-  mainWindow.setSize(WIDTH_WITHOUT_SIDEBAR, mainWindow.getSize()[1], true);
+  const [, h] = mainWindow.getSize();
+  const { workArea } = getWindowDisplay(mainWindow);
+  mainWindow.setBounds({
+    x: Math.round(workArea.x + (workArea.width - WIDTH_WITHOUT_SIDEBAR) / 2),
+    y: Math.round(workArea.y + (workArea.height - h) / 2),
+    width: WIDTH_WITHOUT_SIDEBAR,
+    height: h,
+  }, true);
 }
 
 function toggleSidebar(mainWindow) {
@@ -256,4 +262,4 @@ function createMenuTemplate(mainWindow) {
 
 }
 
-module.exports = { createMenuTemplate, showHideTasks, showSidebar, hideSidebar, toggleSidebar, updateMenuSettings };
+module.exports = { createMenuTemplate, showHideTasks, showSidebar, hideSidebar, toggleSidebar, centerOnDisplay, updateMenuSettings };

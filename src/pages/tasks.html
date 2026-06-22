@@ -9,20 +9,19 @@
   <link rel="stylesheet" href="../css/tasks.css">
   <link rel="stylesheet" href="../css/icon.css">
   <link rel="stylesheet" href="../components/editable-div.css">
-  <link rel="stylesheet" href="../components/quill.bubble.css">
-  <script src="../components/quill.js"></script>
 </head>
 <body>
-  
-  <!-- for moving the electron app window -->
-  <header></header>
 
   <!-- set app margins, allow spacing for the header, etc. -->
   <div class="app-container">
 
     <div id="tasks" class="vertical-container">
+      <div class="tab-container">
+        <div class="tab tab-active" data-list="work">Work</div>
+        <div class="tab" data-list="personal">Personal</div>
+      </div>
       <div class="input-box-container">
-        <input id="addTaskInputBox" type="text" spellcheck="false" placeholder="+ Add task" autofocus tabindex="-1" />
+        <input id="addTaskInputBox" type="text" spellcheck="false" placeholder="+ Add task" tabindex="-1" />
       </div>
 
       <div id="listTasksArea" class="task-list">
@@ -38,7 +37,7 @@
     <div id="sidebar" class="sidebar">
       <div id="taskDetails" class="display-none">
         <div id="taskDetailsTitle" data-placeholder="No Title"></div>        
-        <div id="notesTextArea"></div>
+        <textarea id="notesTextArea" spellcheck="false" placeholder="Add notes here..."></textarea>
       </div>
       <div class="sidebar-icon-container">
         <img src="../images/circle_checked.svg" class="icon-sidebar">

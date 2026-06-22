@@ -64,17 +64,6 @@ body {
   margin: 0px;
 }
 
-/* creates space at the top of the window that allows the app window to be moved */
-header {
-  -webkit-app-region: drag;
-  height: 24px;
-  position: fixed;
-  top: 0px;
-  width: 100%;
-  background-color: var(--color-background);
-  z-index: 100;
-}
-
 h1 {
   font-size: 140% !important;
   font-weight: bold;

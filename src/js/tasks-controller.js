@@ -7,6 +7,7 @@ let _selectedTask = null;
 let _editableTaskDetailsTitle = null;
 let _taskNotes = null;
 const _addTaskInputBox = document.getElementById("addTaskInputBox");
+let _activeList = 'work';
 
 /****************************************************************************
  * Element Binding
@@ -24,7 +25,8 @@ function bindEvents() {
         flagged: false,
         completed: false,
         deleted: false,
-        notes: null
+        notes: null,
+        list: _activeList
       };
 
       if (event.shiftKey) {
@@ -67,38 +69,61 @@ function bindEvents() {
   });
 
   // task notes
-  _taskNotes.on('text-change', function(delta, oldDelta, source) {
-    // note: delta is the formatted contents in Quill
-  
-    // update the notes indicator in the task list
-    const div =  document.querySelector(`[data-id="${_selectedTask.id}"]`);
+  _taskNotes.addEventListener('input', function() {
+    const div = document.querySelector(`[data-id="${_selectedTask.id}"]`);
     const img = div.getElementsByClassName("icon-note")[0];
-    const isEmpty = _taskNotes.getContents().ops.length === 1 && _taskNotes.getText().trim() === "";
+    const isEmpty = _taskNotes.value.trim() === "";
 
     if (isEmpty) {
-      if (delta.ops.length > 1) {
-        // this is the state the editor gets into when the user types something that results in a
-        // list (e.g., -, *, or 1.)
-        // in this state, we still want to save the contents, but we don't want to reset the editor to ""
-        img.setAttribute('src', '');
-        _selectedTask.notes = null;
-      } else {
-        img.setAttribute('src', '');
-        _taskNotes.setText("");
-        _selectedTask.notes = null;
-      }
+      img.setAttribute('src', '');
+      _taskNotes.value = "";
+      _selectedTask.notes = null;
     } else {
       img.setAttribute('src', '../images/note.svg');
-      _selectedTask.notes = _taskNotes.getContents();
+      _selectedTask.notes = _taskNotes.value;
     }
 
     tasks.saveTasks();
+  });
 
+  // add functionality to the notes that automatically continues a list
+  _taskNotes.addEventListener('keydown', function(event) {
+    if (event.key !== 'Enter') return;
+
+    const value = _taskNotes.value;
+    const selStart = _taskNotes.selectionStart;
+    const lineStart = value.lastIndexOf('\n', selStart - 1) + 1;
+    const lineEnd = value.indexOf('\n', selStart);
+    const isLastLine = lineEnd === -1;
+    const fullLine = value.substring(lineStart, isLastLine ? value.length : lineEnd);
+
+    if (fullLine === '- ' && isLastLine) {
+      event.preventDefault();
+      _taskNotes.value = value.substring(0, lineStart) + value.substring(lineStart + fullLine.length);
+      _taskNotes.selectionStart = _taskNotes.selectionEnd = lineStart;
+      _taskNotes.dispatchEvent(new Event('input'));
+      return;
+    }
+
+    if (fullLine.startsWith('- ')) {
+      event.preventDefault();
+      _taskNotes.value = value.substring(0, selStart) + '\n- ' + value.substring(selStart);
+      _taskNotes.selectionStart = _taskNotes.selectionEnd = selStart + 3;
+      _taskNotes.dispatchEvent(new Event('input'));
+    }
   });
 
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape') {
       window.electronAPI.hideWindow();
+    }
+    if (event.metaKey && event.key === '1') {
+      event.preventDefault();
+      selectTab('work');
+    }
+    if (event.metaKey && event.key === '2') {
+      event.preventDefault();
+      selectTab('personal');
     }
   });
 
@@ -180,19 +205,25 @@ function selectTask(task) {
 
 }
 
+function extractTextFromNotes(notes) {
+  if (notes === null) return '';
+  if (typeof notes === 'string') return notes;
+  // Migrate legacy Quill Delta format
+  if (notes.ops) {
+    return notes.ops.map(op => typeof op.insert === 'string' ? op.insert : '').join('').replace(/\n$/, '');
+  }
+  return '';
+}
+
 function showTaskDetails(task) {
 
   _editableTaskDetailsTitle.setText(task.title);
 
-  if (task.notes !== null) {
-    _taskNotes.setContents(task.notes);
-  } else {
-    _taskNotes.setText("");
-  }
+  _taskNotes.value = extractTextFromNotes(task.notes);
 
   taskDetails.classList.remove("display-none");
 
-  _taskNotes.focus();   // Set focus to the notes box
+  _taskNotes.focus();
 
 }
 
@@ -282,7 +313,7 @@ function toggleCompleted(task) {
   }
 
   let nextTaskToHighlight = null;
-  let numActiveTasks = tasks.getNumActiveTasks();
+  let numActiveTasks = tasks.getNumActiveTasks(_activeList);
 
   // get the next task to highlight
   if (numActiveTasks === 1) {
@@ -294,11 +325,11 @@ function toggleCompleted(task) {
   } else {
     // ASSERT: there are at least two tasks in the active task list (before the complete action)
     // ASSERT: the task being complete is the currently highlighted task
-    if (task === tasks.getNextTask(task, true, false, false)) {
+    if (task === tasks.getNextTask(task, true, false, false, _activeList)) {
       // ASSERT: the task being completed is the last task (i.e., in the last position) in the list
-      nextTaskToHighlight = tasks.getPreviousTask(task, true, false, false);  // highlight the previous
+      nextTaskToHighlight = tasks.getPreviousTask(task, true, false, false, _activeList);  // highlight the previous
     } else {
-      nextTaskToHighlight = tasks.getNextTask(task, true, false, false);  // highlight the next task
+      nextTaskToHighlight = tasks.getNextTask(task, true, false, false, _activeList);  // highlight the next task
     }
   }
   
@@ -310,10 +341,10 @@ function toggleCompleted(task) {
 
 function selectPreviousTask(task) {
   let previousTask = null
-  if (tasks.getFirstTask(true, settings.showingCompleted, settings.showingDeleted) === _selectedTask) {
+  if (tasks.getFirstTask(true, settings.showingCompleted, settings.showingDeleted, _activeList) === _selectedTask) {
     _addTaskInputBox.focus();
   } else {
-    previousTask = tasks.getPreviousTask(task, true, settings.showingCompleted, settings.showingDeleted);
+    previousTask = tasks.getPreviousTask(task, true, settings.showingCompleted, settings.showingDeleted, _activeList);
   }
   selectTask(previousTask);
 }
@@ -321,9 +352,9 @@ function selectPreviousTask(task) {
 function selectNextTask(task) {
   let nextTask = null;
   if (document.activeElement === _addTaskInputBox) {
-    nextTask = tasks.getFirstTask(true, settings.showingCompleted, settings.showingDeleted);
+    nextTask = tasks.getFirstTask(true, settings.showingCompleted, settings.showingDeleted, _activeList);
   } else {
-    nextTask = tasks.getNextTask(task, true, settings.showingCompleted, settings.showingDeleted);
+    nextTask = tasks.getNextTask(task, true, settings.showingCompleted, settings.showingDeleted, _activeList);
   }
   selectTask(nextTask);
 }
@@ -345,11 +376,11 @@ function deleteTaskAndHighlightNextTask(task) {
 
   let groupCount;
   if (task.deleted) {
-    groupCount = tasks.getNumDeletedTasks();
+    groupCount = tasks.getNumDeletedTasks(_activeList);
   } else if (task.completed) {
-    groupCount = tasks.getNumCompletedTasks();
+    groupCount = tasks.getNumCompletedTasks(_activeList);
   } else {
-    groupCount = tasks.getNumActiveTasks();
+    groupCount = tasks.getNumActiveTasks(_activeList);
   }
 
   if (groupCount === 1) {
@@ -357,10 +388,10 @@ function deleteTaskAndHighlightNextTask(task) {
   } else if (task !== _selectedTask) {
     nextTaskToHighlight = _selectedTask;
   } else {
-    if (task === tasks.getNextTask(task, includeActive, includeCompleted, includeDeleted)) {
-      nextTaskToHighlight = tasks.getPreviousTask(task, includeActive, includeCompleted, includeDeleted);
+    if (task === tasks.getNextTask(task, includeActive, includeCompleted, includeDeleted, _activeList)) {
+      nextTaskToHighlight = tasks.getPreviousTask(task, includeActive, includeCompleted, includeDeleted, _activeList);
     } else {
-      nextTaskToHighlight = tasks.getNextTask(task, includeActive, includeCompleted, includeDeleted);
+      nextTaskToHighlight = tasks.getNextTask(task, includeActive, includeCompleted, includeDeleted, _activeList);
     }
   }
 
@@ -638,18 +669,25 @@ function setNoTitle(div, hasNoTitle) {
 
 function renderTasks() {
 
+  // Update tab labels with current active task counts for each list
+  document.querySelectorAll('.tab').forEach(tab => {
+    const list = tab.dataset.list;
+    const label = list.charAt(0).toUpperCase() + list.slice(1);
+    tab.textContent = `${label} (${tasks.getNumActiveTasks(list)})`;
+  });
+
   let tasksToRender = null;
 
   // reset the active tasks container
   activeContainer.innerHTML = "";
-  if (tasks.getNumActiveTasks() < 1 &&
+  if (tasks.getNumActiveTasks(_activeList) < 1 &&
       settings.showingCompleted === false &&
       settings.showingDeleted === false) {
     // hide both the header and the list of active tasks if there are no tasks
     // and neither the completed or deleted list is showing
     activeHeading.classList.add("display-none");
     activeContainer.classList.add("display-none");
-  } else if (tasks.getNumActiveTasks() > 0 &&
+  } else if (tasks.getNumActiveTasks(_activeList) > 0 &&
       settings.showingCompleted === false &&
       settings.showingDeleted === false) {
     // hide the header if only the active tasks are showing
@@ -680,7 +718,7 @@ function renderTasks() {
     deletedContainer.classList.add("display-none"); 
   }
   
-  tasksToRender = tasks.getTasks();
+  tasksToRender = tasks.getTasks(true, true, true, _activeList);
   tasksToRender.forEach(task => {
 
     // Create the div that will hold all the elements of the task
@@ -698,19 +736,19 @@ function renderTasks() {
   });
 
   // handle an empty active list
-  if (tasks.getNumActiveTasks() == 0) {
+  if (tasks.getNumActiveTasks(_activeList) == 0) {
     const emptyDropContainer = getEmptyDropContainer("Drop active tasks here.");
     activeContainer.appendChild(emptyDropContainer);
   }
 
   // handle an empty completed list
-  if (tasks.getNumCompletedTasks() == 0 && settings.showingCompleted) {
+  if (tasks.getNumCompletedTasks(_activeList) == 0 && settings.showingCompleted) {
     const emptyDropContainer = getEmptyDropContainer("Drop completed tasks here.");
     completedContainer.appendChild(emptyDropContainer);
   }
 
   // handle an empty deleted list
-  if (tasks.getNumDeletedTasks() == 0 && settings.showingDeleted) {
+  if (tasks.getNumDeletedTasks(_activeList) == 0 && settings.showingDeleted) {
     const emptyDropContainer = getEmptyDropContainer("Drop deleted tasks here.");
     deletedContainer.appendChild(emptyDropContainer);
   }
@@ -775,9 +813,14 @@ draggableContainers.forEach(container => {
 
     const children = document.getElementById(container.id).children;
     const updatedOrder = Array.from(children).map(div => div.dataset.id);
-    let taskArray = tasks.getTasks();
-    taskArray.sort((a, b) => updatedOrder.indexOf(a.id) - updatedOrder.indexOf(b.id));
-    tasks.replaceTasks(taskArray);
+    const allTasks = tasks.getTasks(true, true, true);
+    const thisListTasks = allTasks.filter(t => (t.list || 'personal') === _activeList);
+    const otherListTasks = allTasks.filter(t => (t.list || 'personal') !== _activeList);
+    thisListTasks.sort((a, b) => {
+      const ia = updatedOrder.indexOf(a.id), ib = updatedOrder.indexOf(b.id);
+      return (ia === -1 ? Infinity : ia) - (ib === -1 ? Infinity : ib);
+    });
+    tasks.replaceTasks([...thisListTasks, ...otherListTasks]);
     renderTasks();
     selectTask(_selectedTask);
 
@@ -803,6 +846,39 @@ const getDragAfterElement = (container, y) => {
   }, { offset: Number.NEGATIVE_INFINITY }).element;
 };
 
+function selectTab(listName) {
+  _activeList = listName;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('tab-active', t.dataset.list === listName));
+  deselectTask(_selectedTask);
+  renderTasks();
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      selectTab(tab.dataset.list);
+    });
+
+    tab.addEventListener('dragover', (event) => {
+      if (_selectedTask === null || tab.dataset.list === _activeList) return;
+      event.preventDefault();
+      tab.classList.add('tab-drag-over');
+    });
+
+    tab.addEventListener('dragleave', () => {
+      tab.classList.remove('tab-drag-over');
+    });
+
+    tab.addEventListener('drop', () => {
+      tab.classList.remove('tab-drag-over');
+      if (_selectedTask === null || tab.dataset.list === _activeList) return;
+      const task = _selectedTask;
+      task.list = tab.dataset.list;
+      tasks.saveTasks();
+      deselectTask(task);
+      renderTasks();
+    });
+  });
+
 /****************************************************************************
  * Page Initialization
  ****************************************************************************/
@@ -814,28 +890,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   _editableTaskDetailsTitle = new EditableDivWithPlaceholder('taskDetailsTitle', false);
 
-  // TODO: Consider installing Quill via npm (rather than directly using it's .js and .css files)
-  const toolbarOptions = [
-    [{ 'header': 1 }, { 'header': 2 }, { 'header': 3 }],
-    ['blockquote'],
-    ['link']
-  ];
-  _taskNotes = new Quill('#notesTextArea', {
-    modules: {
-      toolbar: toolbarOptions
-    },
-    theme: "bubble",
-    placeholder: "Add notes here...",
-  });
-  _taskNotes.root.setAttribute('spellcheck', false);
-
-  document.getElementById('notesTextArea').addEventListener('click', function (e) {
-    // Check if the clicked element is a link
-    if (e.target.tagName === 'A') {
-      e.preventDefault(); // Prevent default browser action (like navigating)
-      window.electronAPI.openLinkExternal(e.target.href);
-    }
-  });
+  _taskNotes = document.getElementById('notesTextArea');
 
   await tasks.init();
   renderTasks();
