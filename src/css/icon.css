@@ -32,8 +32,7 @@
 .icon-flag-hover:hover,
 .icon-restore-hover:hover
 {
-  /* given an svg with fill/stroke of #555555, the below filter will change the color to be equivalent to --color-purple: #6264ff; */ 
-  filter: invert(7%) sepia(69%) saturate(2731%) hue-rotate(226deg) brightness(101%) contrast(104%);
+  filter: var(--icon-purple-filter)
 }
 
 .icon-trash:hover {
