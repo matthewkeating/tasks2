@@ -1,9 +1,7 @@
 .tab-container {
   display: flex;
+  flex-shrink: 0;
   width: var(--width-main-canvas);
-  position: fixed;
-  top: 24px;
-  z-index: 900;
   background-color: var(--color-background);
   padding: 0 6px;
   box-sizing: border-box;
@@ -39,17 +37,16 @@
 
 .input-box-container {
   display: flex;
-  align-items: center; /* Aligns items vertically */
-  top: 80px;
-  /* the below allows the input box to be always on top */
+  flex-shrink: 0;
+  align-items: center;
   width: var(--width-main-canvas);
-  position: fixed;
-  z-index: 900;
+  margin-top: 22px;
 }
 
 .vertical-container {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .heading-1 {
@@ -99,16 +96,19 @@ of the parent .task element */
 
 .task-list {
   width: var(--width-main-canvas);
-  padding-top: 44px;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin-top: 10px;
 }
 
 .task-title {
   flex: 1;
   margin: 6px;
   padding: 6px;
-  outline: 0px solid transparent;
+  outline: none;
 
   white-space: nowrap;       /* Prevent line breaks */
   overflow: hidden;          /* Hide overflowing text */
@@ -119,7 +119,7 @@ of the parent .task element */
   flex: 1;
   margin: 6px;
   padding: 6px;
-  outline: 0px solid transparent;
+  outline: none;
   background-color: var(--color-input);
 }
 
@@ -174,7 +174,6 @@ of the parent .task element */
   width: 100%;
   height: 100vh;
   justify-content: center;
-  vertical-align: middle;
   display: flex;
 }
 
@@ -208,19 +207,14 @@ of the parent .task element */
   color: var(--color-secondary-text);
 }
 
-#listTasksArea {
-  margin: 58px 0px 0px 0px;
-}
 
 #taskDetails {
-  top: 0px;
-  left: 480px;
   width: 300px;
   padding: 24px 20px 20px 20px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: 100vh; /* Full viewport height */
+  height: 100vh;
 }
 
 /* For the title on the sidebar (if there is no text) */
