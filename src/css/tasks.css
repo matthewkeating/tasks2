@@ -17,7 +17,7 @@
 .input-box-container {
   background-color: var(--color-background);
   box-sizing: border-box;
-  padding: 20px 20px 2px 20px;
+  padding: 20px 20px 4px 20px;
   width: var(--width-main-canvas);
 }
 
@@ -36,11 +36,11 @@
 #addTaskInputBox:focus {
   background-color: var(--color-sidebar);
   border: 1px solid transparent;
-  color: var(--color-primary-text) !important;
+  color: var(--color-text-primary) !important;
 }
 
 #addTaskInputBox:not(:placeholder-shown) {
-  color: var(--color-secondary-text);
+  color: var(--color-text-dim-2);
 }
 
 /*******************************************
@@ -49,10 +49,10 @@
 
 .tab-container {
   background-color: var(--color-background);
-  border-bottom: 1px solid var(--color-action-separator);
+  border-bottom: 1px solid var(--color-border);
   box-sizing: border-box;
   display: flex;
-  padding: 2px 20px 0px 20px;
+  padding: 4px 20px 0px 20px;
   width: var(--width-main-canvas);
 }
 
@@ -61,26 +61,26 @@
   text-align: center;
   padding: 10px 0px 16px 0px;
   cursor: pointer;
-  color: var(--color-task-action-text);
+  color: var(--color-text-dim-3);
   font-size: 81%;
   text-transform: uppercase;
 }
 
 .tab:hover {
-  color: var(--color-secondary-text);
+  color: var(--color-text-dim-2);
 }
 
 .tab-active, .tab-active:hover {
-  color: var(--color-primary-text);
+  color: var(--color-text-primary);
   position: relative;
 }
 
 .tab-active::after {
   content: ""; /* Required for pseudo-elements */
   display: block; /* Make it a block element */
-  width: 45%; /* Set the desired width of the border */
+  width: 47%; /* Set the desired width of the border */
   height: 1px; /* Set the height of the border */
-  background-color: var(--color-primary-text); /* Border color */
+  background-color: var(--color-purple); /* Border color */
   position: absolute; /* Position it absolutely */
   left: 50%; /* Center it horizontally */
   bottom: 0; /* Position at the bottom */
@@ -88,7 +88,7 @@
 }
 
 .tab-drag-over {
-  color: var(--color-primary-text);
+  color: var(--color-text-primary);
   background-color: rgba(255, 255, 255, 0.05);
   border-radius: 5px;
 }
@@ -111,7 +111,7 @@
 .heading-1 {
   font-size: 81%;
   text-transform: uppercase;
-  color: var(--color-task-list-header);
+  color: var(--color-text-dim-3);
   padding-top: 8px;
   margin-bottom: 5px;
 }
@@ -119,7 +119,7 @@
 .heading-n {
   font-size: 81%;
   text-transform: uppercase;
-  color: var(--color-task-list-header);
+  color: var(--color-text-dim-3);
   padding-top: 20px;
   margin-bottom: 5px;
 }
@@ -140,7 +140,7 @@ I will use a CSS pseudo-element (in this case, the .task::after element). */
   display: block; /* Make it a block element */
   width: 95%; /* Set the desired width of the border */
   height: 1px; /* Set the height of the border */
-  background-color: var(--color-action-separator); /* Border color */
+  background-color: var(--color-border); /* Border color */
   position: absolute; /* Position it absolutely */
   left: 50%; /* Center it horizontally */
   bottom: 0; /* Position at the bottom */
@@ -165,20 +165,21 @@ of the parent .task element */
 }
 
 .task-title-is-editing {
+  border-radius: 5px;
   flex: 1;
   margin: 6px;
   padding: 6px;
   outline: none;
-  background-color: var(--color-input);
+  background-color: var(--color-background-task-title-is-editing);
 }
 
 .task-title-completed,
 .task-title-deleted {
-  color: var(--color-completed-task-title);
+  color: var(--color-text-dim-3);
 }
 
 .task-selected {
-  background-color: var(--color-selected) !important;
+  background-color: var(--color-selected-task) !important;
 }
 
 .task-empty {
@@ -209,7 +210,7 @@ of the parent .task element */
 }
 
 .dragging {
-  background-color: var(--color-selected);
+  background-color: var(--color-selected-task);
   transform: scale(0.95);  /* Decrease div size */
 }
 
@@ -232,7 +233,12 @@ of the parent .task element */
   width: 100%;
   height: 100vh;
   justify-content: center;
+  align-items: center;
   display: flex;
+}
+
+#taskDetailsTitleText {
+  color: var(--color-text-dim-1);
 }
 
  #taskDetails {
@@ -246,7 +252,7 @@ of the parent .task element */
 
 /* For the title on the sidebar (if there is no text) */
 .placeholder {
-  color: var(--color-task-action-text) !important;
+  color: var(--color-text-dim-2) !important;
   top: 8px !important;
   left: 8px !important;
   font-size: 130%;
@@ -275,5 +281,5 @@ of the parent .task element */
 }
 
 #notesTextArea::placeholder {
-  color: var(--color-task-action-text);
+  color: var(--color-text-dim-2);
 }

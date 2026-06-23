@@ -1,43 +1,43 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --color-purple: #606eb6;
-    --color-red: #AE3532;
-    --color-sidebar: #1a1a1a;
+    --color-red: #863533;
+
+    --color-text-primary: #dddddd;
+    --color-text-dim-1: #cccccc;  /* task title (sidebar) */
+    --color-text-dim-2: #757575;  /* tab title hover, placeholder text (for text boxes), etc. */
+    --color-text-dim-3: #555555;  /* unselect tab, task list headers, completed/deleted task titles, etc. */
+    --color-selected-text: #31364c;
+    
     --color-background: #1F1F1F;
-    --color-input: #2b2b2b;
-    --color-button-hover: #2f2f2f;
-    --color-action-separator: #2f2f2f;
-    --color-selected: #2f2f2f;
-    --color-empty-list-text: #555555;
-    --color-menu-info: #555555;
-    --color-task-list-header: #555555;
-    --color-task-action-text: #555555;
-    --color-completed-task-title: #555555;
-    --color-secondary-text: #757575;
-    --color-primary-text: #dddddd;
-    --icon-purple-filter: filter: brightness(0) saturate(100%) invert(37%) sepia(78%) saturate(329%) hue-rotate(192deg) brightness(101%) contrast(91%);
+    --color-sidebar: #1b1b1b;
+    --color-background-task-title-is-editing: #252525;
+    --color-border: #2f2f2f;
+    --color-selected-task: #2f2f2f;
+    --color-gray-icon: #555555;
+
     --width-main-canvas: 480px;
   }
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    --color-purple: #8a7dbb;
-    --color-red: #AE3532;
-    --color-sidebar: #F9F9F9;
+    --color-purple: #9075f4;
+    --color-red: #ad504e;
+
+    --color-text-primary: #222222;
+    --color-text-dim-1: #333333;
+    --color-text-dim-2: #555555;
+    --color-text-dim-3: #999999;
+    --color-selected-text: #dee0ed;
+
     --color-background: #FFFFFF;
-    --color-input: #F9F9F9;
-    --color-button-hover: #EEEEEE;
-    --color-action-separator: #EEEEEE;
-    --color-selected: #F0F0F0;
-    --color-empty-list-text: #555555;
-    --color-menu-info: #555555;
-    --color-task-list-header: #555555;
-    --color-task-action-text: #555555;
-    --color-completed-task-title: #888888;
-    --color-secondary-text: #888888;
-    --color-primary-text: #222222;
-    --icon-purple-filter: filter: brightness(0) saturate(100%) invert(56%) sepia(8%) saturate(1758%) hue-rotate(212deg) brightness(90%) contrast(92%);
+    --color-sidebar: #F5F5F5;
+    --color-background-task-title-is-editing: #FAFAFA;
+    --color-border: #EEEEEE;
+    --color-selected-task: #EEEEEE;
+    --color-gray-icon: #555555; 
+    
     --width-main-canvas: 480px;
   }
 }
@@ -46,7 +46,7 @@
   font-size: .86rem;
   font-family: Verdana, sans-serif;
   -webkit-font-smoothing: antialiased;
-  color: var(--color-primary-text);
+  color: var(--color-text-primary);
 
   /* disable selection */
   -webkit-user-select: none;
@@ -68,6 +68,10 @@ body {
 
 img {
   -webkit-user-drag: none; /* For Chrome and Safari */
+}
+
+::selection {
+  background-color: var(--color-selected-text)
 }
 
 /* Hides the scrollbar */

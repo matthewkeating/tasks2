@@ -10,10 +10,7 @@
 }
 
 .icon-circle,
-.icon-drag-drop {
-  width: 22px;
-}
-
+.icon-drag-drop,
 .icon-flag {
   width: 22px;
 }
@@ -28,18 +25,86 @@
   margin-right: 4px;
 }
 
+.icon-circle,
+.icon-drag-drop,
+.icon-flag,
+.icon-note,
+.icon-trash,
+.icon-restore {
+  display: inline-block;
+  height: 22px;
+  background-color: var(--color-gray-icon);
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+}
+
+.icon-note {
+  height: 14px;
+  background-color: transparent;
+}
+
+.icon-note-visible {
+  background-color: var(--color-gray-icon);
+  -webkit-mask-image: url('../images/note.svg');
+  mask-image: url('../images/note.svg');
+}
+
+.icon-drag-drop {
+  align-self: center;
+  -webkit-mask-image: url('../images/drag_drop.svg');
+  mask-image: url('../images/drag_drop.svg');
+}
+
+.icon-circle-checked {
+  -webkit-mask-image: url('../images/circle_checked.svg');
+  mask-image: url('../images/circle_checked.svg');
+}
+
+.icon-circle-empty {
+  -webkit-mask-image: url('../images/circle_empty.svg');
+  mask-image: url('../images/circle_empty.svg');
+}
+
+.icon-flag-filled {
+  -webkit-mask-image: url('../images/flag_filled.svg');
+  mask-image: url('../images/flag_filled.svg');
+}
+
+.icon-flag-empty {
+  -webkit-mask-image: url('../images/flag_empty.svg');
+  mask-image: url('../images/flag_empty.svg');
+}
+
+.icon-trash {
+  -webkit-mask-image: url('../images/trash.svg');
+  mask-image: url('../images/trash.svg');
+}
+
+.icon-restore {
+  -webkit-mask-image: url('../images/restore.svg');
+  mask-image: url('../images/restore.svg');
+}
+
 .icon-circle-hover:hover,
 .icon-flag-hover:hover,
-.icon-restore-hover:hover
-{
-  filter: var(--icon-purple-filter)
+.icon-restore-hover:hover {
+  background-color: var(--color-purple);
 }
 
 .icon-trash:hover {
-  /* given an svg with fill/stroke of #555555, the below filter will change the color to be equivalent to  --color-red: #AE3532; */
-  filter: brightness(0) saturate(100%) invert(36%) sepia(10%) saturate(4466%) hue-rotate(304deg) brightness(92%) contrast(83%);
+  background-color: var(--color-red);
 }
 
 .icon-sidebar {
+  display: inline-block;
   width: 50px;
+  height: 50px;
+  background-color: var(--color-gray-icon);
+  -webkit-mask: url('../images/circle_checked.svg') no-repeat center;
+  mask: url('../images/circle_checked.svg') no-repeat center;
+  mask-size: contain;
 }

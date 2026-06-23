@@ -75,11 +75,11 @@ function bindEvents() {
     const isEmpty = _taskNotes.value.trim() === "";
 
     if (isEmpty) {
-      img.setAttribute('src', '');
+      img.classList.remove("icon-note-visible");
       _taskNotes.value = "";
       _selectedTask.notes = null;
     } else {
-      img.setAttribute('src', '../images/note.svg');
+      img.classList.add("icon-note-visible");
       _selectedTask.notes = _taskNotes.value;
     }
 
@@ -413,13 +413,13 @@ function restoreTask(task) {
 
 function getCompleteAction(task) {
 
-  const circle = document.createElement("img");
+  const circle = document.createElement("span");
   circle.classList.add("icon-circle");
 
   if (task.completed === true) {
-    circle.src = "../images/circle_checked.svg";
+    circle.classList.add("icon-circle-checked");
   } else {
-    circle.src = "../images/circle_empty.svg";
+    circle.classList.add("icon-circle-empty");
   }
 
   if (task.deleted === false) {
@@ -443,8 +443,7 @@ function getQuickActions(task) {
 
   // restore (only for deleted tasks)
   if (task.deleted === true) {
-    const restoreImage = document.createElement("img");
-    restoreImage.src = "../images/restore.svg";
+    const restoreImage = document.createElement("span");
     restoreImage.classList.add("icon-restore");
     restoreImage.classList.add("icon-restore-hover");
     restoreImage.onclick = () => { restoreTask(task); }
@@ -452,20 +451,19 @@ function getQuickActions(task) {
   }
 
   // delete
-  const deleteImage = document.createElement("img");
-  deleteImage.src = "../images/trash.svg";
+  const deleteImage = document.createElement("span");
   deleteImage.classList.add("icon-trash");
   deleteImage.onclick = () => { deleteTaskAndHighlightNextTask(task); }
   quickActions.appendChild(deleteImage);
 
   // flag
-  const flag = document.createElement("img");
-  if (task.flagged) {
-    flag.src = "../images/flag_filled.svg";
-  } else {
-    flag.src = "../images/flag_empty.svg";
-  }
+  const flag = document.createElement("span");
   flag.classList.add("icon-flag");
+  if (task.flagged) {
+    flag.classList.add("icon-flag-filled");
+  } else {
+    flag.classList.add("icon-flag-empty");
+  }
   // flag (only for active tasks)
   if (task.completed === false && task.deleted === false) {
     flag.classList.add("icon-flag-hover");
@@ -609,9 +607,9 @@ function getListItem(task){
   }
 
   // Create the img element that will hold the note indicator
-  const note = document.createElement("img");
+  const note = document.createElement("span");
   if (task.notes !== null) {
-      note.src = "../images/note.svg";
+    note.classList.add("icon-note-visible");
   }
   note.classList.add("icon-note");
   note.addEventListener("click", (event) => { _selectedTask = task; });
@@ -629,9 +627,8 @@ function getListItem(task){
 }
 
 function getEmptyDropContainer(text) {
-  const dragDrop = document.createElement("img");
+  const dragDrop = document.createElement("span");
   dragDrop.classList.add("icon-drag-drop");
-  dragDrop.src = "../images/drag_drop.svg";
 
   const title = document.createElement("div");
   title.classList.add("task-title");

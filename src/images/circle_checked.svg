@@ -4,7 +4,7 @@
   width="64px"
   height="64px"
   fill-rule="nonzero">
-  <g fill="#555555"
+  <g fill="currentColor"
     fill-rule="nonzero"
     stroke="none"
     stroke-width="1"
